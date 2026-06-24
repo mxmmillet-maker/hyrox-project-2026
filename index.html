@@ -109,6 +109,7 @@ svg{display:block}
     <section class="page" id="p-force"></section>
     <section class="page" id="p-charge"></section>
     <section class="page" id="p-risque"></section>
+    <section class="page" id="p-strat"></section>
   </main>
 </div>
 
@@ -130,6 +131,38 @@ const CIBLES = {                                     // cibles Pro (dénominateu
 };
 
 const SESSIONS = [
+  { date:"2026-05-25", type:"m1", tags:["m1","steady","outdoor"],
+    dureeMin:56.9, distanceKm:8.92, fcMoy:136, fcMax:147, rpe:null,
+    zonesMin:{z1:33.4,z2:23.5,z3:0,z4:0,z5:0}, decouplagePct:null,
+    notes:"EF longue Z2 — 8,9 km @ 136 bpm. EF 1,157." },
+  { date:"2026-05-30", type:"m1", tags:["m1","steady","outdoor"],
+    dureeMin:48.2, distanceKm:7.28, fcMoy:135, fcMax:149, rpe:null,
+    zonesMin:{z1:31.6,z2:16.6,z3:0,z4:0,z5:0}, decouplagePct:null,
+    notes:"EF Z2 — 7,3 km @ 135 bpm. EF 1,122." },
+  { date:"2026-06-10", type:"kite", tags:["kite","fatigue"],
+    dureeMin:169, distanceKm:null, fcMoy:150, fcMax:176, rpe:null,
+    zonesMin:{z1:57.8,z2:45.5,z3:0,z4:66.0,z5:0}, decouplagePct:null,
+    notes:"Kite ~2.8h actives @ 150 bpm — charge croisée (fatigue systémique, pas d impact course)." },
+  { date:"2026-06-11", type:"kite", tags:["kite","fatigue"],
+    dureeMin:87, distanceKm:null, fcMoy:161, fcMax:175, rpe:null,
+    zonesMin:{z1:0,z2:0,z3:86.8,z4:0,z5:0}, decouplagePct:null,
+    notes:"Kite ~1.4h actives @ 161 bpm — charge croisée (fatigue systémique, pas d impact course)." },
+  { date:"2026-06-12", type:"kite", tags:["kite","fatigue"],
+    dureeMin:269, distanceKm:null, fcMoy:141, fcMax:173, rpe:null,
+    zonesMin:{z1:64.2,z2:154.6,z3:49.7,z4:0,z5:0}, decouplagePct:null,
+    notes:"Kite ~4.5h actives @ 141 bpm — charge croisée (fatigue systémique, pas d impact course)." },
+  { date:"2026-06-13", type:"kite", tags:["kite","fatigue"],
+    dureeMin:117, distanceKm:null, fcMoy:122, fcMax:150, rpe:null,
+    zonesMin:{z1:117.0,z2:0,z3:0,z4:0,z5:0}, decouplagePct:null,
+    notes:"Kite ~1.9h actives @ 122 bpm — charge croisée (fatigue systémique, pas d impact course)." },
+  { date:"2026-06-14", type:"kite", tags:["kite","fatigue"],
+    dureeMin:90, distanceKm:null, fcMoy:157, fcMax:173, rpe:null,
+    zonesMin:{z1:30.3,z2:0,z3:59.8,z4:0,z5:0}, decouplagePct:null,
+    notes:"Kite ~1.5h actives @ 157 bpm — charge croisée (fatigue systémique, pas d impact course)." },
+  { date:"2026-06-15", type:"kite", tags:["kite","fatigue"],
+    dureeMin:90, distanceKm:null, fcMoy:131, fcMax:131, rpe:null,
+    zonesMin:{z1:90.2,z2:0,z3:0,z4:0,z5:0}, decouplagePct:null,
+    notes:"Kite ~1.5h actives @ 131 bpm — charge croisée (fatigue systémique, pas d impact course)." },
   { date:"2026-06-19", type:"m6", tags:["m6","hiit"],
     dureeMin:23.9, distanceKm:null, fcMoy:171, fcMax:186, rpe:8.5,
     zonesMin:{z1:0,z2:0,z3:7,z4:15,z5:1}, decouplagePct:null,
@@ -148,9 +181,15 @@ const SESSIONS = [
     notes:"Team WOD (Team of 2) — CAP 6' + E2MOM ×10. Coût modéré (décalage timing sur poste rest). Dérive propre 142→174, pas de Z5 : endurance de force à coût aérobie moyen." }
 ];
 
+/* Tests dédiés (pas des séances) — repères qui se mettent à jour seuls quand tu en logges un nouveau */
+const TESTS = [
+  { date:"2026-06-18", type:"seuil", allure:"4'55–5'05", fcLo:178, fcHi:182,
+    notes:"Test tapis — seuil ~4'55-5'05/km @ 178-182. Bande Z4 167-181 validée." }
+];
+
 /* libellés modules */
 const MOD = { m1:"M1 facile", m2:"M2 seuil", m3:"M3 compromise",
-  m4:"M4 haut", m5:"M5 jambes", m6:"M6 endur.-force" };
+  m4:"M4 haut", m5:"M5 jambes", m6:"M6 endur.-force", kite:"Kite (croisé)" };
 
 /* ============================================================
    SILO 2 — FORMULES (fonctions pures : entrée → sortie, zéro effet de bord)
@@ -192,7 +231,7 @@ function pmc(sessions){                              // CTL(42j)=fitness, ATL(7j
   const i = series.length-1;
   return { series, ctl, atl,
     fitness:ctl[i], fatigue:atl[i], forme:ctl[i]-atl[i],
-    fiable: series.length >= 28 };                   // honnête : pas avant ~4 sem
+    fiable: series.length >= 28 && sessions.length >= 12 };  // honnête : 4 sem ET assez dense
 }
 function acwr(sessions){                              // aigu 7j : chronique 28j
   const a = dailyLoad(sessions, new Date(AUJ.getTime()-6*864e5), AUJ)
@@ -200,12 +239,23 @@ function acwr(sessions){                              // aigu 7j : chronique 28j
   const c = dailyLoad(sessions, new Date(AUJ.getTime()-27*864e5), AUJ)
             .reduce((s,x)=>s+x.load,0)/28;
   const joursData = (AUJ - new Date(sessions[0].date))/864e5;
-  return { ratio: c>0 ? a/c : null, fiable: joursData >= 28 };
+  const nb28 = sessions.filter(s=>(AUJ - new Date(s.date))/864e5 <= 27).length;
+  return { ratio: c>0 ? a/c : null, fiable: joursData >= 28 && nb28 >= 8 };  // besoin d'un socle chronique dense, pas juste 28 j d'ancienneté
 }
 function chargeParTheme(sessions){                   // TRIMP groupé par module (via tag type)
   const out = {};
   for(const s of sessions){ out[s.type] = (out[s.type]||0) + trimp(s); }
   return out;
+}
+function coursePoints(){                              // EF de chaque footing, en semaines depuis le départ
+  if(!SESSIONS.length) return [];
+  const start = new Date(SESSIONS.reduce((m,s)=> s.date<m?s.date:m, SESSIONS[0].date));
+  return SESSIONS.filter(s=>s.tags && s.tags.includes("steady") && s.distanceKm && ef(s)!=null)
+    .map(s=>({ week:(new Date(s.date)-start)/(7*864e5), ef:ef(s), date:s.date }))
+    .sort((a,b)=>a.week-b.week);
+}
+function dernierSeuil(){                              // dernier test de seuil loggé
+  return TESTS.filter(t=>t.type==="seuil").slice(-1)[0] || null;
 }
 
 /* ============================================================
@@ -216,7 +266,8 @@ const PAGES = [
   {id:"p-course", tab:"Course", render:renderCourse},
   {id:"p-force",  tab:"Force",  render:renderForce},
   {id:"p-charge", tab:"Charge & forme", render:renderCharge},
-  {id:"p-risque", tab:"Risque", render:renderRisque}
+  {id:"p-risque", tab:"Risque", render:renderRisque},
+  {id:"p-strat",  tab:"Stratégie", render:renderStrat}
 ];
 
 function fmt(n,d=2){ return n==null||isNaN(n) ? "—" : Number(n).toFixed(d); }
@@ -246,13 +297,15 @@ function renderGlobal(){
   const p = pmc(SESSIONS), a = acwr(SESSIONS);
   const themeG = chargeParTheme(SESSIONS);
   const totalG = Object.values(themeG).reduce((x,y)=>x+y,0);
-  const m6Share = totalG ? Math.round((themeG.m6||0)/totalG*100) : 0;
+  const domG = Object.entries(themeG).sort((x,y)=>y[1]-x[1])[0] || ["",0];
+  const domLabel = MOD[domG[0]] || domG[0];
+  const domShare = totalG ? Math.round(domG[1]/totalG*100) : 0;
   const formeState = p && p.fiable ? (p.forme>=-10?"ok":"warn") : "";
   const formePill  = p && p.fiable ? (p.forme>=0?"frais":"chargé") : "amorçage";
   const acwrPill   = a.fiable ? fmt(a.ratio,2) : "calibration";
   return `
   <h2>Vue globale</h2>
-  <div class="verdict">${SESSIONS.length} séances loggées (charge dominée à ${m6Share}% par l'hybride/M6). Prochaine donnée
+  <div class="verdict">${SESSIONS.length} séances loggées · charge la plus lourde : <b>${domLabel}</b> (${domShare}%). Prochaine donnée
     structurante : <b>test de décrochage (jeudi)</b>.</div>
   <div class="card">
     <p class="lbl">Décision du jour — 3 feux</p>
@@ -280,6 +333,7 @@ function renderGlobal(){
 
 function renderCourse(){
   const s = repereM1();                               // la M1 = repère aérobie
+  const ts = dernierSeuil();
   return `
   <h2>Course</h2>
   <div class="card">
@@ -293,7 +347,7 @@ function renderCourse(){
   </div>
   <div class="card">
     <p class="lbl">Allure seuil</p>
-    <table class="refs"><tr><td>Dernier test (18/06)</td><td>4'55–5'05 @ 178–182</td></tr>
+    <table class="refs"><tr><td>Dernier test (${ts ? ts.date.slice(8)+"/"+ts.date.slice(5,7) : "—"})</td><td>${ts ? ts.allure+" @ "+ts.fcLo+"–"+ts.fcHi : "—"}</td></tr>
       <tr><td>Cible course (fatigué)</td><td>${CIBLES.allureCourse}/km</td></tr></table>
   </div>
   <div class="card">
@@ -379,6 +433,61 @@ function renderRisque(){
   </div>`;
 }
 
+function renderStrat(){
+  const cp = coursePoints();
+  const efNow = cp.length ? cp[cp.length-1].ef : null;
+  const p = pmc(SESSIONS), a = acwr(SESSIONS);
+  const F = s => `<div style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--hx-ink-800);border:1px solid var(--line);padding:8px 10px;border-radius:8px;margin:6px 0;overflow-x:auto;white-space:pre-wrap;line-height:1.6">${s}</div>`;
+  return `
+  <h2>Stratégie</h2>
+  <div class="verdict">Course <b>Hyrox Pro le 02/10</b>. Modèle <b>polarisé</b> : ~80% du volume en facile (Z2), ~20% en dur (seuil + stations, Z4+). Trois chantiers : <b>durabilité aérobie</b>, <b>endurance de force</b>, <b>tenir l'allure fatigué</b>.</div>
+
+  <div class="card">
+    <p class="lbl">Le principe — pourquoi polarisé (80/20)</p>
+    <p class="muted">Le facile (Z2) construit le moteur aérobie — cœur, mitochondries, capillaires — sans fatigue nerveuse, donc en gros volume. Le dur (Z4/Z5 : HIIT, WOD, seuil) pousse le plafond. Le piège, c'est le « gris » du milieu : toujours moyen, ça fatigue sans rien développer. D'où des footings <b>vraiment lents</b> et des séances dures <b>vraiment dures</b>. Tes WOD/HIIT = le pôle dur + le stimulus d'endurance de force ; tes footings EF = le pôle facile.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">EF — efficacité aérobie · chantier n°1</p>
+    ${F("EF = (distance_m ÷ durée_min) ÷ FC_moy")}
+    <p class="muted">Mètres parcourus par battement de cœur. À FC égale, un EF qui monte = moteur plus efficace. Cible <b>${CIBLES.ef}</b> · actuel <b>${fmt(efNow,3)}</b>. On veut voir la courbe rejoindre la bande +4 à +7% d'ici 14 semaines.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">Décrochage aérobie (Pa:HR) — durabilité</p>
+    ${F("décrochage % = (EF_1ère moitié − EF_2ᵉ moitié) ÷ EF_1ère moitié × 100")}
+    <p class="muted">Sur un effort long à allure constante, mesure la dérive du cœur. Si la FC grimpe alors que l'allure ne bouge pas, la base aérobie lâche. Cible <b>&lt; ${CIBLES.decouplagePct}%</b> (idéal &lt; 5%). Mesuré par le test tapis prévu jeudi.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">TRIMP — la charge d'une séance</p>
+    ${F("TRIMP = durée_min × HRr × 0,64 × e^(1,92 × HRr)\nHRr = (FC_moy − " + PROFIL.fcRepos + ") ÷ " + RESERVE)}
+    <p class="muted">Le coût d'une séance = durée pondérée par l'intensité. La pondération est <b>exponentielle</b> : une minute à 175 bpm pèse bien plus qu'une minute à 130. C'est la brique de base de toutes les courbes de charge.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">PMC — fitness / fatigue / forme</p>
+    ${F("CTL (fitness) = moyenne mobile expo 42 j du TRIMP\nATL (fatigue) = moyenne mobile expo 7 j\nTSB (forme) = CTL − ATL")}
+    <p class="muted">La fitness se construit lentement (42 j), la fatigue monte et redescend vite (7 j). Leur écart = la forme. Très négatif = chargé (mauvais jour pour tester) ; proche de 0 ou positif = frais (jour de perf). ${p.fiable ? "Actuel — fitness <b>"+fmt(p.fitness,0)+"</b> · fatigue <b>"+fmt(p.fatigue,0)+"</b> · forme <b>"+fmt(p.forme,0)+"</b>." : "En amorçage tant que l'historique n'est pas assez dense."}</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">ACWR — risque de blessure</p>
+    ${F("ACWR = charge moyenne 7 j ÷ charge moyenne 28 j")}
+    <p class="muted">Compare ce que tu encaisses cette semaine à ton habitude du mois. Zone confortable <b>0,8–1,3</b> ; alerte au-dessus de <b>1,5</b> (montée trop rapide) ; sous 0,8 = sous-charge. ${a.fiable ? "Actuel — <b>"+fmt(a.ratio,2)+"</b>." : "En calibration."} <i>À lire avec recul</i> : indicateur grossier, base de preuve discutée — une alerte parmi d'autres, pas un verdict.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">Le kite — charge croisée</p>
+    <p class="muted">Le kite compte dans la charge (TRIMP → fitness/fatigue/ACWR) parce qu'il fatigue vraiment le système. Mais il est <b>exclu de l'EF</b> (ce n'est pas de la course) et n'est pas un stimulus Hyrox. À gérer comme une fatigue de fond — surtout avant les grosses séances.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">Garde-fous — honnêteté de la donnée</p>
+    <p class="muted">Tant que la donnée est trop creuse, les indicateurs restent en <b>calibration</b> plutôt que d'afficher un faux chiffre. PMC fiable seulement avec ≥ 28 j <i>et</i> ≥ 12 séances ; ACWR avec ≥ 8 séances sur 28 j. Un chiffre faux est pire que pas de chiffre.</p>
+  </div>`;
+}
+
 /* --- mini-graphes SVG (offline, zéro dépendance) --- */
 function efChartSVG(){
   const W=300,H=150,pad=28;
@@ -386,15 +495,18 @@ function efChartSVG(){
   const lo=[1.149,1.156,1.162,1.169,1.176,1.182,1.189,1.195];
   const hi=[1.149,1.160,1.172,1.183,1.195,1.206,1.218,1.229];
   const yMin=1.12,yMax=1.24;
-  const X=w=>pad+(w/14)*(W-pad-8);
-  const Y=v=>H-22-((v-yMin)/(yMax-yMin))*(H-22-8);
+  const X=w=>pad+(Math.max(0,Math.min(14,w))/14)*(W-pad-8);
+  const Y=v=>H-22-((Math.max(yMin,Math.min(yMax,v))-yMin)/(yMax-yMin))*(H-22-8);
   const band=[...wk.map((w,i)=>`${X(w)},${Y(hi[i])}`),
     ...wk.map((w,i)=>`${X(w)},${Y(lo[i])}`).reverse()].join(" ");
-  const real = ef(repereM1());                        // point réel semaine ~0
+  const pts = coursePoints();                          // tous les footings EF, tracés à leur date
+  const dots = pts.map(p=>`<circle cx="${X(p.week)}" cy="${Y(p.ef)}" r="4" fill="var(--real)"/>`).join("");
+  const path = pts.length>1
+    ? `<polyline points="${pts.map(p=>`${X(p.week)},${Y(p.ef)}`).join(" ")}" fill="none" stroke="var(--real)" stroke-width="2"/>` : "";
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="150">
     <polygon points="${band}" fill="var(--target)" opacity="0.28"/>
     <line x1="${pad}" y1="${H-22}" x2="${W-8}" y2="${H-22}" stroke="var(--line)"/>
-    <circle cx="${X(0)}" cy="${Y(real)}" r="4" fill="var(--real)"/>
+    ${path}${dots}
     <text x="${pad}" y="${H-6}" font-size="10" fill="var(--hint)">0</text>
     <text x="${W-14}" y="${H-6}" font-size="10" fill="var(--hint)">14 sem</text>
     <text x="2" y="${Y(1.24)+4}" font-size="10" fill="var(--hint)">1.24</text>
