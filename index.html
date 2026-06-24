@@ -100,7 +100,7 @@ svg{display:block}
 <body>
 <div class="wrap">
   <header>
-    <p class="brand"><b>Hyrox Pro — Max</b> · J−101 · phase 1</p>
+    <p class="brand" id="brand"><b>Hyrox Pro — Max</b> · phase 1</p>
     <div class="tabs" id="tabs"></div>
   </header>
   <main class="swiper" id="swiper">
@@ -534,6 +534,9 @@ function pmcChartSVG(p){
 /* --- navigation swipe + onglets --- */
 const tabsEl = document.getElementById("tabs");
 const swiper = document.getElementById("swiper");
+/* compte à rebours dynamique : recalculé à chaque ouverture depuis la date réelle */
+const jRace = Math.max(0, Math.ceil((RACE - new Date())/864e5));
+document.getElementById("brand").innerHTML = `<b>Hyrox Pro — Max</b> · J−${jRace} · phase 1`;
 PAGES.forEach((pg,i)=>{
   document.getElementById(pg.id).innerHTML = pg.render();
   const b=document.createElement("button");
