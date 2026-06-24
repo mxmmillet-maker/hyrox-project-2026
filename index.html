@@ -55,8 +55,8 @@ header{position:sticky;top:0;z-index:10;background:var(--bg);
   scrollbar-width:none}
 .swiper::-webkit-scrollbar{display:none}
 .page{flex:0 0 100%;scroll-snap-align:start;padding:14px;min-width:100%}
-h2{font-family:var(--font-display);font-size:22px;font-weight:700;text-transform:uppercase;
-  letter-spacing:.03em;margin:2px 0 12px;color:var(--txt)}
+h2{display:none}                         /* titres de page masqués (l'onglet actif fait office de titre) */
+.page{padding-top:10px}                  /* court espace au-dessus du 1er encadré */
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
   padding:13px 14px;margin-bottom:12px}
 .card .lbl{font-size:11px;color:var(--hint);margin:0 0 8px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
@@ -440,11 +440,11 @@ function renderStrat(){
   const F = s => `<div style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--hx-ink-800);border:1px solid var(--line);padding:8px 10px;border-radius:8px;margin:6px 0;overflow-x:auto;white-space:pre-wrap;line-height:1.6">${s}</div>`;
   return `
   <h2>Stratégie</h2>
-  <div class="verdict">Course <b>Hyrox Pro le 02/10</b>. Modèle <b>polarisé</b> : ~80% du volume en facile (Z2), ~20% en dur (seuil + stations, Z4+). Trois chantiers : <b>durabilité aérobie</b>, <b>endurance de force</b>, <b>tenir l'allure fatigué</b>.</div>
+  <div class="verdict">Course <b>Hyrox Pro le 02/10</b>. Le spécifique Hyrox = <b>courir fatigué entre des stations</b> qui chargent fort → l'effort vit surtout en <b>Z3–début Z4</b> (compromis), pas en « 80% facile » classique. Le Z2 reste la base aérobie + la récup. Trois chantiers : <b>durabilité aérobie</b>, <b>endurance de force</b>, <b>tenir l'allure fatigué</b>.</div>
 
   <div class="card">
-    <p class="lbl">Le principe — pourquoi polarisé (80/20)</p>
-    <p class="muted">Le facile (Z2) construit le moteur aérobie — cœur, mitochondries, capillaires — sans fatigue nerveuse, donc en gros volume. Le dur (Z4/Z5 : HIIT, WOD, seuil) pousse le plafond. Le piège, c'est le « gris » du milieu : toujours moyen, ça fatigue sans rien développer. D'où des footings <b>vraiment lents</b> et des séances dures <b>vraiment dures</b>. Tes WOD/HIIT = le pôle dur + le stimulus d'endurance de force ; tes footings EF = le pôle facile.</p>
+    <p class="lbl">Le principe — distribution d'intensité (spécifique Hyrox)</p>
+    <p class="muted">En endurance pure, le modèle classique est polarisé : ~80% facile, ~20% dur. <b>Hyrox déroge</b> : l'épreuve se court en <b>Z3 à début Z4</b> — allure de compromis sous fatigue, entre le stress métabolique des stations et l'impact mécanique. Le gros du travail <b>spécifique</b> vit donc dans cette bande, pas dans le facile. Le Z2 garde un rôle clé mais minoritaire : entretenir le moteur aérobie et <b>récupérer</b> entre les grosses séances. Le Z5 franc reste rare. Concrètement : tes WOD/HIIT + course fatiguée = le cœur du spécifique (Z3–Z4) ; tes footings EF = la base aérobie en Z2.</p>
   </div>
 
   <div class="card">
@@ -494,7 +494,7 @@ function efChartSVG(){
   const wk=[0,2,4,6,8,10,12,14];
   const lo=[1.149,1.156,1.162,1.169,1.176,1.182,1.189,1.195];
   const hi=[1.149,1.160,1.172,1.183,1.195,1.206,1.218,1.229];
-  const yMin=1.12,yMax=1.24;
+  const yMin=1.10,yMax=1.24;
   const X=w=>pad+(Math.max(0,Math.min(14,w))/14)*(W-pad-8);
   const Y=v=>H-22-((Math.max(yMin,Math.min(yMax,v))-yMin)/(yMax-yMin))*(H-22-8);
   const band=[...wk.map((w,i)=>`${X(w)},${Y(hi[i])}`),
@@ -510,7 +510,7 @@ function efChartSVG(){
     <text x="${pad}" y="${H-6}" font-size="10" fill="var(--hint)">0</text>
     <text x="${W-14}" y="${H-6}" font-size="10" fill="var(--hint)">14 sem</text>
     <text x="2" y="${Y(1.24)+4}" font-size="10" fill="var(--hint)">1.24</text>
-    <text x="2" y="${Y(1.12)}" font-size="10" fill="var(--hint)">1.12</text>
+    <text x="2" y="${Y(1.10)}" font-size="10" fill="var(--hint)">1.10</text>
   </svg>`;
 }
 function pmcChartSVG(p){
@@ -538,13 +538,14 @@ PAGES.forEach((pg,i)=>{
   document.getElementById(pg.id).innerHTML = pg.render();
   const b=document.createElement("button");
   b.className="tab"+(i===0?" on":""); b.textContent=pg.tab;
-  b.onclick=()=>document.getElementById(pg.id).scrollIntoView({behavior:"smooth",inline:"start",block:"nearest"});
+  b.onclick=()=>swiper.scrollTo({left:i*swiper.clientWidth,behavior:"smooth"});
   tabsEl.appendChild(b);
 });
 swiper.addEventListener("scroll",()=>{
   const i=Math.round(swiper.scrollLeft/swiper.clientWidth);
   [...tabsEl.children].forEach((t,k)=>t.classList.toggle("on",k===i));
-  const at=tabsEl.children[i]; if(at) at.scrollIntoView({inline:"nearest",block:"nearest"});
+  const at=tabsEl.children[i];
+  if(at) tabsEl.scrollTo({left:at.offsetLeft-(tabsEl.clientWidth-at.clientWidth)/2,behavior:"smooth"});
 },{passive:true});
 </script>
 </body>
