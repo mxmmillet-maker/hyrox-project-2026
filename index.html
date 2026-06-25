@@ -120,7 +120,7 @@ svg{display:block}
    Le reste est calculé. Rien de dérivé n'est stocké → rien ne périme.
    ============================================================ */
 const PROFIL = { fcRepos:51, fcMax:196 };           // réserve = 145
-const AUJ = new Date("2026-06-23");
+const AUJ = new Date("2026-06-25");
 const RACE = new Date("2026-10-02");
 
 const CIBLES = {                                     // cibles Pro (dénominateur des jauges)
@@ -178,7 +178,11 @@ const SESSIONS = [
   { date:"2026-06-23", type:"m6", tags:["m6"],
     dureeMin:29.7, distanceKm:null, fcMoy:149, fcMax:178, rpe:7.25,
     zonesMin:{z1:6.9,z2:6.7,z3:10.2,z4:5.9,z5:0}, decouplagePct:null,
-    notes:"Team WOD (Team of 2) — CAP 6' + E2MOM ×10. Coût modéré (décalage timing sur poste rest). Dérive propre 142→174, pas de Z5 : endurance de force à coût aérobie moyen." }
+    notes:"Team WOD (Team of 2) — CAP 6' + E2MOM ×10. Coût modéré (décalage timing sur poste rest). Dérive propre 142→174, pas de Z5 : endurance de force à coût aérobie moyen." },
+  { date:"2026-06-25", type:"m1", tags:["m1","indoor","drift"],
+    dureeMin:72.2, distanceKm:10.41, fcMoy:145, fcMax:160, rpe:null,
+    zonesMin:{z1:9.5,z2:46.9,z3:15.7,z4:0,z5:0}, decouplagePct:4.0,
+    notes:"Test dérive cardiaque tapis — échauffement 13' + 2×30' à allure constante. Découplage Pa:HR 4,0% (FC 147→153). Salle chaude, ventilo faible, déshydraté → 4% conservateur (dérive thermique incluse)." }
 ];
 
 /* Tests dédiés (pas des séances) — repères qui se mettent à jour seuls quand tu en logges un nouveau */
@@ -257,6 +261,9 @@ function coursePoints(){                              // EF de chaque footing, e
 function dernierSeuil(){                              // dernier test de seuil loggé
   return TESTS.filter(t=>t.type==="seuil").slice(-1)[0] || null;
 }
+function dernierDecouplage(){                          // dernière séance avec dérive Pa:HR mesurée
+  return SESSIONS.filter(s=>s.decouplagePct!=null).sort((a,b)=>a.date<b.date?1:-1)[0] || null;
+}
 
 /* ============================================================
    SILO 3 — RENDU (une fonction par page ; uniquement de l'affichage)
@@ -334,6 +341,7 @@ function renderGlobal(){
 function renderCourse(){
   const s = repereM1();                               // la M1 = repère aérobie
   const ts = dernierSeuil();
+  const dd = dernierDecouplage();                     // dernière dérive Pa:HR mesurée
   return `
   <h2>Course</h2>
   <div class="card">
@@ -352,7 +360,10 @@ function renderCourse(){
   </div>
   <div class="card">
     <p class="lbl">Décrochage aérobie (Pa:HR)</p>
-    <p class="muted">En attente du test standard (tapis 2%, 6'10/km, 60 min). Cible &lt; ${CIBLES.decouplagePct}%.</p>
+    ${dd ? `<table class="refs"><tr><td>Dernier test (${dd.date.slice(8)+"/"+dd.date.slice(5,7)})</td><td><b>${fmt(dd.decouplagePct,1)}%</b></td></tr>
+      <tr><td>Cible</td><td>&lt; ${CIBLES.decouplagePct}% (idéal &lt; 5%)</td></tr></table>
+    <p class="muted" style="margin-top:8px">${dd.notes}</p>`
+    : `<p class="muted">En attente du test standard (tapis 2%, 6'10/km, 60 min). Cible &lt; ${CIBLES.decouplagePct}%.</p>`}
   </div>
   <div class="card">
     <p class="lbl">Exposant de fatigue (Riegel)</p>
