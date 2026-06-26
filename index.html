@@ -179,10 +179,11 @@ const SESSIONS = [
     dureeMin:29.7, distanceKm:null, fcMoy:149, fcMax:178, rpe:7.25,
     zonesMin:{z1:6.9,z2:6.7,z3:10.2,z4:5.9,z5:0}, decouplagePct:null,
     notes:"Team WOD (Team of 2) — CAP 6' + E2MOM ×10. Coût modéré (décalage timing sur poste rest). Dérive propre 142→174, pas de Z5 : endurance de force à coût aérobie moyen." },
-  { date:"2026-06-25", type:"m1", tags:["m1","indoor","drift"],
+  { date:"2026-06-25", type:"m1", tags:["m1","indoor","steady","drift"],
     dureeMin:72.2, distanceKm:10.41, fcMoy:145, fcMax:160, rpe:null,
     zonesMin:{z1:9.5,z2:46.9,z3:15.7,z4:0,z5:0}, decouplagePct:4.0,
-    notes:"Test dérive cardiaque tapis — échauffement 13' + 2×30' à allure constante. Découplage Pa:HR 4,0% (FC 147→153). Salle chaude, ventilo faible, déshydraté → 4% conservateur (dérive thermique incluse)." }
+    efKm:9.56, efMin:59.1, efFc:149.8,
+    notes:"Test dérive cardiaque tapis — échauffement 13' + 2×30' à 6'11/km (1,5% incl.), allure constante. EF segment steady 1,079 @ 149,8 bpm. Découplage Pa:HR 4,0% (FC 147→153). Salle chaude, ventilo faible, déshydraté → 4% conservateur ; EF pénalisé par chaleur+inclinaison (flat/frais serait plus haut)." }
 ];
 
 /* Tests dédiés (pas des séances) — repères qui se mettent à jour seuls quand tu en logges un nouveau */
@@ -202,8 +203,10 @@ const MOD = { m1:"M1 facile", m2:"M2 seuil", m3:"M3 compromise",
 const RESERVE = PROFIL.fcMax - PROFIL.fcRepos;
 
 function ef(s){                                      // efficiency factor, m/min/bpm
-  if(!s.distanceKm || !s.fcMoy) return null;
-  return ((s.distanceKm*1000)/s.dureeMin)/s.fcMoy;
+  // override possible : EF calculé sur le segment steady (efKm/efMin/efFc), sinon séance entière
+  const dist=s.efKm??s.distanceKm, dur=s.efMin??s.dureeMin, fc=s.efFc??s.fcMoy;
+  if(!dist || !fc) return null;
+  return ((dist*1000)/dur)/fc;
 }
 function hrr(fc){ return (fc - PROFIL.fcRepos)/RESERVE; }   // % réserve (0–1)
 
@@ -505,12 +508,13 @@ function efChartSVG(){
   const wk=[0,2,4,6,8,10,12,14];
   const lo=[1.149,1.156,1.162,1.169,1.176,1.182,1.189,1.195];
   const hi=[1.149,1.160,1.172,1.183,1.195,1.206,1.218,1.229];
-  const yMin=1.10,yMax=1.24;
+  const pts = coursePoints();                          // footings EF, tracés à leur date
+  const yMax=1.24;
+  const yMin = pts.length ? Math.min(1.10, Math.min(...pts.map(p=>p.ef))-0.02) : 1.10;
   const X=w=>pad+(Math.max(0,Math.min(14,w))/14)*(W-pad-8);
   const Y=v=>H-22-((Math.max(yMin,Math.min(yMax,v))-yMin)/(yMax-yMin))*(H-22-8);
   const band=[...wk.map((w,i)=>`${X(w)},${Y(hi[i])}`),
     ...wk.map((w,i)=>`${X(w)},${Y(lo[i])}`).reverse()].join(" ");
-  const pts = coursePoints();                          // tous les footings EF, tracés à leur date
   const dots = pts.map(p=>`<circle cx="${X(p.week)}" cy="${Y(p.ef)}" r="4" fill="var(--real)"/>`).join("");
   const path = pts.length>1
     ? `<polyline points="${pts.map(p=>`${X(p.week)},${Y(p.ef)}`).join(" ")}" fill="none" stroke="var(--real)" stroke-width="2"/>` : "";
@@ -521,7 +525,7 @@ function efChartSVG(){
     <text x="${pad}" y="${H-6}" font-size="10" fill="var(--hint)">0</text>
     <text x="${W-14}" y="${H-6}" font-size="10" fill="var(--hint)">14 sem</text>
     <text x="2" y="${Y(1.24)+4}" font-size="10" fill="var(--hint)">1.24</text>
-    <text x="2" y="${Y(1.10)}" font-size="10" fill="var(--hint)">1.10</text>
+    <text x="2" y="${Y(yMin)}" font-size="10" fill="var(--hint)">${yMin.toFixed(2)}</text>
   </svg>`;
 }
 function pmcChartSVG(p){
