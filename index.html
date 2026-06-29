@@ -120,7 +120,7 @@ svg{display:block}
    Le reste est calculé. Rien de dérivé n'est stocké → rien ne périme.
    ============================================================ */
 const PROFIL = { fcRepos:51, fcMax:196 };           // réserve = 145
-const AUJ = new Date("2026-06-25");
+const AUJ = new Date("2026-06-26");
 const RACE = new Date("2026-10-02");
 
 const CIBLES = {                                     // cibles Pro (dénominateur des jauges)
@@ -183,7 +183,11 @@ const SESSIONS = [
     dureeMin:72.2, distanceKm:10.41, fcMoy:145, fcMax:160, rpe:null,
     zonesMin:{z1:9.5,z2:46.9,z3:15.7,z4:0,z5:0}, decouplagePct:4.0,
     efKm:9.56, efMin:59.1, efFc:149.8,
-    notes:"Test dérive cardiaque tapis — échauffement 13' + 2×30' à 6'11/km (1,5% incl.), allure constante. EF segment steady 1,079 @ 149,8 bpm. Découplage Pa:HR 4,0% (FC 147→153). Salle chaude, ventilo faible, déshydraté → 4% conservateur ; EF pénalisé par chaleur+inclinaison (flat/frais serait plus haut)." }
+    notes:"Test dérive cardiaque tapis — échauffement 13' + 2×30' à 6'11/km (1,5% incl.), allure constante. EF segment steady 1,079 @ 149,8 bpm. Découplage Pa:HR 4,0% (FC 147→153). Salle chaude, ventilo faible, déshydraté → 4% conservateur ; EF pénalisé par chaleur+inclinaison (flat/frais serait plus haut)." },
+  { date:"2026-06-26", type:"m6", tags:["m6","hiit","partner"],
+    dureeMin:23.7, distanceKm:null, fcMoy:151, fcMax:179, rpe:7.5,
+    zonesMin:{z1:4.2,z2:6.0,z3:9.3,z4:4.0,z5:0}, decouplagePct:null,
+    notes:"WOD à 2 (contrat partagé, chacun la moitié des reps). Thrusters haltères 14 kg + burpee deadlift haltères 20 kg, paliers cal 20-20-30-30-40-40. Chrono lancé ~20s après le départ montre. FC moy 151 / max 179, coût modéré (repos pendant que le partenaire bosse), pas de Z5." }
 ];
 
 /* Tests dédiés (pas des séances) — repères qui se mettent à jour seuls quand tu en logges un nouveau */
