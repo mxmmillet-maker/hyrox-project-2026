@@ -100,7 +100,7 @@ svg{display:block}
 <body>
 <div class="wrap">
   <header>
-    <p class="brand" id="brand"><b>Hyrox Pro — Max</b> · phase 1</p>
+    <p class="brand" id="brand"><b>Hyrox Pro — Max</b> · phase 2</p>
     <div class="tabs" id="tabs"></div>
   </header>
   <main class="swiper" id="swiper">
@@ -120,7 +120,7 @@ svg{display:block}
    Le reste est calculé. Rien de dérivé n'est stocké → rien ne périme.
    ============================================================ */
 const PROFIL = { fcRepos:51, fcMax:196 };           // réserve = 145
-const AUJ = new Date("2026-06-26");
+const AUJ = new Date("2026-07-02");
 const RACE = new Date("2026-10-02");
 
 const CIBLES = {                                     // cibles Pro (dénominateur des jauges)
@@ -191,7 +191,15 @@ const SESSIONS = [
   { date:"2026-06-29", type:"m6", tags:["m6","hiit","wod"],
     dureeMin:24.8, distanceKm:null, fcMoy:153, fcMax:174, rpe:8,
     zonesMin:{z1:2.5,z2:7.8,z3:12.5,z4:1.9,z5:0}, decouplagePct:null,
-    notes:"AMRAP 24' solo, chipper en boucle : 20 cal row / 20 thrusters DB 14 kg×2 / 30 cal row / 30 burpee-deadlift DB 20 kg×2 / 40 cal row / 40 mountain climbers. Dernier palier row non terminé (8/40 cal au gong). FC moy 153 / max 174, zone reine Z3 (12,5 min) — endurance de force à coût aérobie de compromis, pas de Z5. Plus continu que le WOD à 2 du 26/06 (solo, pas de repos partenaire). RPE 8 estimé. Données Apple Watch." }
+    notes:"AMRAP 24' solo, chipper en boucle : 20 cal row / 20 thrusters DB 14 kg×2 / 30 cal row / 30 burpee-deadlift DB 20 kg×2 / 40 cal row / 40 mountain climbers. Dernier palier row non terminé (8/40 cal au gong). FC moy 153 / max 174, zone reine Z3 (12,5 min) — endurance de force à coût aérobie de compromis, pas de Z5. Plus continu que le WOD à 2 du 26/06 (solo, pas de repos partenaire). RPE 8 estimé. Données Apple Watch." },
+  { date:"2026-06-30", type:"m1", tags:["m1","tapis","steady","fatigue"],
+    dureeMin:34.9, distanceKm:5.87, fcMoy:142, fcMax:155, rpe:null,
+    zonesMin:{z1:4.9,z2:26.0,z3:2.5,z4:0,z5:0}, decouplagePct:null,
+    notes:"Course Z2 tapis — console 5'57/km (1,5% incl., 31°C salle), distance montre sous-estimée. FC moy 142 / max 155, 26 min pleins en Z2. Précédée de 2h hammam → FC majorée par la chaleur (variable confondante), EF réel probablement meilleur. Pôle facile du polarisé. Données Apple Watch." },
+  { date:"2026-07-01", type:"m2", tags:["m2","tapis","seuil","fatigue"],
+    dureeMin:40.5, distanceKm:null, fcMoy:153, fcMax:184, rpe:7.5,
+    zonesMin:{z1:4.5,z2:4.3,z3:8.2,z4:14.3,z5:3.0}, decouplagePct:null,
+    notes:"Seuil tapis — 5×5 min @ ~12,5 km/h réel (tapis sur-estime +30%, recalé par FC), récup active 1 min. FC moy 153 / max 184, zone reine Z4 (14 min) + 3 min Z5, RPE 7,5. Précédé de 2h hammam (variable confondante). Premier bloc M2 loggé. Données Apple Watch." }
 ];
 
 /* Tests dédiés (pas des séances) — repères qui se mettent à jour seuls quand tu en logges un nouveau */
@@ -199,6 +207,13 @@ const TESTS = [
   { date:"2026-06-18", type:"seuil", allure:"4'55–5'05", fcLo:178, fcHi:182,
     notes:"Test tapis — seuil ~4'55-5'05/km @ 178-182. Bande Z4 167-181 validée." }
 ];
+
+/* Référence officielle — Hyrox Open Men Solo, nov. 2025 (benchmark de départ / profil) */
+const REFERENCE_OPEN = {
+  date:"2025-11", format:"Open Men Solo",
+  fcMoy:181, trimp:277, pctZ4plus:96, deriveBpm:11,
+  notes:"96% du temps de course en Z4+, FC moy 181 bpm. Dérive +11 bpm sur les 8 runs, allure tenue jusqu'à R7. R8 : effondrement d'allure = crampes neuromusculaires (départ trop agressif après les fentes sandbag), pas une défaillance aérobie. Poste rameur = anomalie FC ~168 bpm (levier de récup potentiel à reproduire)."
+};
 
 /* libellés modules */
 const MOD = { m1:"M1 facile", m2:"M2 seuil", m3:"M3 compromise",
@@ -321,15 +336,17 @@ function renderGlobal(){
   const formeState = p && p.fiable ? (p.forme>=-10?"ok":"warn") : "";
   const formePill  = p && p.fiable ? (p.forme>=0?"frais":"chargé") : "amorçage";
   const acwrPill   = a.fiable ? fmt(a.ratio,2) : "calibration";
+  const dd = dernierDecouplage();
+  const durState = dd ? (dd.decouplagePct < CIBLES.decouplagePct ? "ok" : "warn") : "";
+  const durPill  = dd ? fmt(dd.decouplagePct,1)+"%" : "à mesurer";
   return `
   <h2>Vue globale</h2>
-  <div class="verdict">${SESSIONS.length} séances loggées · charge la plus lourde : <b>${domLabel}</b> (${domShare}%). Prochaine donnée
-    structurante : <b>test de décrochage (jeudi)</b>.</div>
+  <div class="verdict">${SESSIONS.length} séances loggées · charge la plus lourde : <b>${domLabel}</b> (${domShare}%). Décrochage aérobie déjà mesuré le 25/06 (<b>${dd?fmt(dd.decouplagePct,1):"—"}%</b>, sous la cible). Prochaine donnée structurante : <b>PFT T1</b> + <b>test seuil calibré</b> (conditions neutres).</div>
   <div class="card">
     <p class="lbl">Décision du jour — 3 feux</p>
-    <div class="row"><span class="dot"></span>
+    <div class="row"><span class="dot ${durState}"></span>
       <span class="nm">Durabilité <small>· décrochage</small></span>
-      <span class="pill">à mesurer</span></div>
+      <span class="pill">${durPill}</span></div>
     <div class="row"><span class="dot ${formeState}"></span>
       <span class="nm">Fraîcheur <small>· forme (TSB)</small></span>
       <span class="pill">${formePill}</span></div>
@@ -346,7 +363,17 @@ function renderGlobal(){
   </div>
   <p class="muted" style="margin-top:10px">En calibration : une jauge de progression a besoin de
     plusieurs points (et des tests décrochage / PFT) avant d'afficher un %. Formule du dénominateur
-    à amender ensemble.</p>`;
+    à amender ensemble.</p>
+  <div class="card" style="margin-top:12px">
+    <p class="lbl">Référence — Open Men Solo · nov. 2025</p>
+    <table class="refs">
+      <tr><td>FC moyenne course</td><td>${REFERENCE_OPEN.fcMoy} bpm</td></tr>
+      <tr><td>Temps en Z4+</td><td>${REFERENCE_OPEN.pctZ4plus}%</td></tr>
+      <tr><td>Charge (TRIMP)</td><td>${REFERENCE_OPEN.trimp}</td></tr>
+      <tr><td>Dérive cardiaque (8 runs)</td><td>+${REFERENCE_OPEN.deriveBpm} bpm</td></tr>
+    </table>
+    <p class="muted" style="margin-top:8px">${REFERENCE_OPEN.notes}</p>
+  </div>`;
 }
 
 function renderCourse(){
@@ -478,7 +505,7 @@ function renderStrat(){
   <div class="card">
     <p class="lbl">Décrochage aérobie (Pa:HR) — durabilité</p>
     ${F("décrochage % = (EF_1ère moitié − EF_2ᵉ moitié) ÷ EF_1ère moitié × 100")}
-    <p class="muted">Sur un effort long à allure constante, mesure la dérive du cœur. Si la FC grimpe alors que l'allure ne bouge pas, la base aérobie lâche. Cible <b>&lt; ${CIBLES.decouplagePct}%</b> (idéal &lt; 5%). Mesuré par le test tapis prévu jeudi.</p>
+    <p class="muted">Sur un effort long à allure constante, mesure la dérive du cœur. Si la FC grimpe alors que l'allure ne bouge pas, la base aérobie lâche. Cible <b>&lt; ${CIBLES.decouplagePct}%</b> (idéal &lt; 5%). Déjà mesuré le 25/06 : <b>4,0%</b> (sous la cible). Prochain point : test seuil calibré en conditions neutres.</p>
   </div>
 
   <div class="card">
@@ -559,7 +586,7 @@ const tabsEl = document.getElementById("tabs");
 const swiper = document.getElementById("swiper");
 /* compte à rebours dynamique : recalculé à chaque ouverture depuis la date réelle */
 const jRace = Math.max(0, Math.ceil((RACE - new Date())/864e5));
-document.getElementById("brand").innerHTML = `<b>Hyrox Pro — Max</b> · J−${jRace} · phase 1`;
+document.getElementById("brand").innerHTML = `<b>Hyrox Pro — Max</b> · J−${jRace} · phase 2`;
 PAGES.forEach((pg,i)=>{
   document.getElementById(pg.id).innerHTML = pg.render();
   const b=document.createElement("button");
