@@ -4,19 +4,16 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#050505">
-<title>Hyrox Pro — Max</title>
+<title>Hyrox Pro — Max · V3</title>
 <!-- Charte Hyrox : polices via Google Fonts (rendu fidèle en ligne) + fallback système hors-ligne -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
-   SILO 3 — PRÉSENTATION : tokens isolés.
-   Design system « Mission Hyrox Pro » branché ici (dark-first,
-   jaune signature). Silos 1 (données) et 2 (formules) : intacts.
+   SILO 3 — PRÉSENTATION : tokens isolés. (inchangé vs V2)
    ============================================================ */
 :root{
-  /* --- Tokens bruts du design system (charte) --- */
   --hx-yellow:#F2EA00; --hx-yellow-bright:#FFF52E; --hx-yellow-deep:#C9C200; --hx-black:#0A0A0A;
   --hx-ink-900:#050505; --hx-ink-850:#0C0D0E; --hx-ink-800:#121316; --hx-ink-700:#1A1C20;
   --hx-ink-600:#24272C; --hx-ink-500:#34383F; --hx-ink-400:#4A4F57; --hx-ink-300:#6B7178;
@@ -25,68 +22,76 @@
   --font-display:'Barlow Condensed','Arial Narrow',sans-serif;
   --font-body:'Barlow',system-ui,-apple-system,sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
-
-  /* --- Mapping vers les noms déjà utilisés par le dashboard --- */
   --bg:var(--hx-ink-900); --surface:var(--hx-ink-700); --line:var(--hx-ink-600);
   --txt:var(--hx-ink-050); --dim:var(--hx-ink-100); --hint:var(--hx-ink-200);
   --ok:var(--hx-green); --warn:var(--hx-orange); --bad:var(--hx-red);
   --accent:var(--hx-yellow); --target:var(--hx-cyan); --real:var(--hx-orange);
-  --track:var(--hx-ink-600);              /* fond des barres / jauges */
-  --radius:14px; --maxw:460px;
+  --track:var(--hx-ink-600);
+  --radius:14px; --radius-sm:6px; --maxw:460px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
-html,body{margin:0;background:var(--bg);color:var(--txt);
-  font-family:var(--font-body);
+html,body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--font-body);
   font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased}
 svg text{font-family:var(--font-mono)}
 .wrap{max-width:var(--maxw);margin:0 auto;background:var(--bg);min-height:100vh}
-header{position:sticky;top:0;z-index:10;background:var(--bg);
-  border-bottom:1px solid var(--line);padding:10px 14px 0}
+header{position:sticky;top:0;z-index:10;background:var(--bg);border-bottom:1px solid var(--line);padding:10px 14px 0}
 .brand{font-size:13px;color:var(--dim);margin:0 0 8px}
-.brand b{color:var(--accent);font-family:var(--font-display);font-weight:700;
-  text-transform:uppercase;letter-spacing:.06em}
+.brand b{color:var(--accent);font-family:var(--font-display);font-weight:700;text-transform:uppercase;letter-spacing:.06em}
 .tabs{display:flex;gap:4px;overflow-x:auto;scrollbar-width:none}
 .tabs::-webkit-scrollbar{display:none}
-.tab{flex:none;font-family:var(--font-display);font-size:15px;text-transform:uppercase;
-  letter-spacing:.06em;padding:7px 11px;border:none;background:none;
-  color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
+.tab{flex:none;font-family:var(--font-display);font-size:15px;text-transform:uppercase;letter-spacing:.06em;
+  padding:7px 11px;border:none;background:none;color:var(--dim);cursor:pointer;border-bottom:2px solid transparent;white-space:nowrap}
 .tab.on{color:var(--accent);border-bottom-color:var(--accent);font-weight:700}
-.swiper{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;
-  scrollbar-width:none}
+.swiper{display:flex;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
 .swiper::-webkit-scrollbar{display:none}
-.page{flex:0 0 100%;scroll-snap-align:start;padding:14px;min-width:100%}
-h2{display:none}                         /* titres de page masqués (l'onglet actif fait office de titre) */
-.page{padding-top:10px}                  /* court espace au-dessus du 1er encadré */
-.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-  padding:13px 14px;margin-bottom:12px}
+.page{flex:0 0 100%;scroll-snap-align:start;padding:14px;min-width:100%;padding-top:12px}
+h2{display:none}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:13px 14px;margin-bottom:12px}
 .card .lbl{font-size:11px;color:var(--hint);margin:0 0 8px;text-transform:uppercase;letter-spacing:.12em;font-weight:600}
 .muted{font-size:12px;color:var(--hint);line-height:1.45}
-/* feux */
 .row{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
 .row:last-child{border-bottom:none}
 .dot{width:9px;height:9px;border-radius:50%;flex:none;background:var(--hint)}
 .dot.ok{background:var(--ok)} .dot.warn{background:var(--warn)} .dot.bad{background:var(--bad)}
 .row .nm{flex:1;font-size:14px}
 .row .nm small{color:var(--hint);font-size:12px}
-.pill{font-family:var(--font-mono);font-size:12px;padding:3px 9px;border-radius:var(--radius-sm,6px);
-  background:var(--track);color:var(--dim);white-space:nowrap}
-.verdict{background:var(--hx-ink-800);border:1px solid var(--line);border-left:3px solid var(--accent);
-  border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--dim);margin-bottom:12px}
+.pill{font-family:var(--font-mono);font-size:12px;padding:3px 9px;border-radius:var(--radius-sm);background:var(--track);color:var(--dim);white-space:nowrap}
+.pill.ok{background:rgba(47,210,122,.15);color:var(--ok)} .pill.warn{background:rgba(255,122,26,.15);color:var(--warn)} .pill.bad{background:rgba(255,59,71,.15);color:var(--bad)}
+.verdict{background:var(--hx-ink-800);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--dim);margin-bottom:12px}
 .verdict b{color:var(--txt)}
-/* jauges */
-.gauges{display:grid;grid-template-columns:1fr 1fr;gap:12px}
-.gauge{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);
-  padding:12px;text-align:center}
-.gauge .gn{font-family:var(--font-display);text-transform:uppercase;letter-spacing:.05em;
-  font-size:14px;font-weight:700;margin:6px 0 2px}
-.gauge .gs{font-size:11px;color:var(--hint);line-height:1.35}
-/* barres de zones */
+/* --- Décision du jour (nouveau, V3) --- */
+.today{border-radius:var(--radius);padding:15px 15px 14px;margin-bottom:12px;border:1px solid var(--line);position:relative;overflow:hidden}
+.today.go{background:linear-gradient(135deg,rgba(47,210,122,.14),var(--surface));border-left:4px solid var(--ok)}
+.today.easy{background:linear-gradient(135deg,rgba(255,122,26,.14),var(--surface));border-left:4px solid var(--warn)}
+.today.rest{background:linear-gradient(135deg,rgba(255,59,71,.13),var(--surface));border-left:4px solid var(--bad)}
+.today .kick{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--hint);font-weight:600;margin:0 0 4px}
+.today .big{font-family:var(--font-display);font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:.02em;line-height:1.05;margin:0 0 6px}
+.today .sub{font-size:13px;color:var(--dim);line-height:1.45}
+.today .sub b{color:var(--txt)}
+/* --- stat trio (nouveau) --- */
+.trio{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:11px 10px;text-align:center}
+.stat .sv{font-family:var(--font-mono);font-size:19px;font-weight:700;color:var(--txt);line-height:1.1}
+.stat .sv small{font-size:12px;color:var(--hint)}
+.stat .sl{font-size:10px;text-transform:uppercase;letter-spacing:.06em;color:var(--hint);margin-top:4px}
+.stat .sarrow{font-size:12px;font-weight:700}
+.up{color:var(--ok)} .down{color:var(--bad)} .flat{color:var(--hint)}
+/* --- timeline phases (nouveau) --- */
+.tl{display:flex;flex-direction:column;gap:2px}
+.tlp{display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:8px;font-size:13px;border:1px solid transparent}
+.tlp.now{background:var(--hx-ink-800);border-color:var(--accent)}
+.tlp.done{opacity:.5}
+.tlp .tln{width:20px;height:20px;border-radius:50%;flex:none;display:flex;align-items:center;justify-content:center;
+  font-family:var(--font-mono);font-size:11px;font-weight:700;background:var(--track);color:var(--dim)}
+.tlp.now .tln{background:var(--accent);color:#000}
+.tlp.done .tln{background:var(--ok);color:#000}
+.tlp .tlname{flex:1;color:var(--dim)} .tlp.now .tlname{color:var(--txt);font-weight:600}
+.tlp .tldate{font-family:var(--font-mono);font-size:11px;color:var(--hint)}
 .zbar{display:flex;height:10px;border-radius:5px;overflow:hidden;margin:8px 0 4px;background:var(--track)}
 .zleg{display:flex;flex-wrap:wrap;gap:8px;font-size:11px;color:var(--dim)}
 .zleg i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:3px;vertical-align:-1px}
-/* charge par thème */
 .theme{display:flex;align-items:center;gap:8px;margin:7px 0;font-size:13px}
-.theme .tn{width:62px;color:var(--dim);font-size:12px}
+.theme .tn{width:70px;color:var(--dim);font-size:12px}
 .theme .tt{flex:1;height:9px;border-radius:5px;background:var(--track);overflow:hidden}
 .theme .tt span{display:block;height:100%;background:var(--accent)}
 .theme .tv{width:34px;text-align:right;color:var(--dim);font-size:12px;font-family:var(--font-mono)}
@@ -94,40 +99,44 @@ table.refs{width:100%;font-size:13px;border-collapse:collapse}
 table.refs td{padding:6px 0;border-bottom:1px solid var(--line)}
 table.refs td:last-child{text-align:right;color:var(--txt);font-family:var(--font-mono);font-size:12px}
 .amorce{font-size:11px;color:var(--warn);margin-top:6px}
+.fx{font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--hx-ink-800);border:1px solid var(--line);
+  padding:8px 10px;border-radius:8px;margin:6px 0;overflow-x:auto;white-space:pre-wrap;line-height:1.6}
 svg{display:block}
 </style>
 </head>
 <body>
 <div class="wrap">
   <header>
-    <p class="brand" id="brand"><b>Hyrox Pro — Max</b> · phase 2</p>
+    <p class="brand" id="brand"><b>Hyrox Pro — Max</b></p>
     <div class="tabs" id="tabs"></div>
   </header>
   <main class="swiper" id="swiper">
-    <section class="page" id="p-global"></section>
+    <section class="page" id="p-jour"></section>
     <section class="page" id="p-course"></section>
-    <section class="page" id="p-force"></section>
+    <section class="page" id="p-dura"></section>
     <section class="page" id="p-charge"></section>
-    <section class="page" id="p-risque"></section>
-    <section class="page" id="p-strat"></section>
+    <section class="page" id="p-force"></section>
+    <section class="page" id="p-plan"></section>
   </main>
 </div>
 
 <script>
 /* ============================================================
-   SILO 1 — DONNÉES (source de vérité)
-   Une séance = un objet. C'est tout ce que tu remplis (toi + moi).
-   Le reste est calculé. Rien de dérivé n'est stocké → rien ne périme.
+   SILO 1 — DONNÉES (source de vérité) — INCHANGÉ vs V2
+   Une séance = un objet. Le reste est calculé.
    ============================================================ */
 const PROFIL = { fcRepos:51, fcMax:196 };           // réserve = 145
-const AUJ = new Date("2026-07-02");
-const RACE = new Date("2026-10-02");
+const RACE   = new Date("2026-10-02");
+/* CORRIGÉ (bug V2) : AUJ était figé au 02/07 → la séance du jour était exclue de la charge,
+   et le compte à rebours (qui, lui, utilisait la vraie date) devenait incohérent.
+   AUJ suit désormais l'horloge réelle. */
+const AUJ = new Date();
 
-const CIBLES = {                                     // cibles Pro (dénominateur des jauges)
-  ef:1.21,            // EF visé fin de prépa (m/min/bpm)
+const CIBLES = {
+  ef:1.21,
   allureSeuil:"4'55", allureCourse:"5'15–5'30",
-  pftSec:1500,        // sub-25 min
-  decouplagePct:8     // plafond visé
+  pftSec:1500,
+  decouplageCible:5, decouplagePlafond:8    // 5% = vraie cible durabilité (science), 8% = plafond acceptable
 };
 
 const SESSIONS = [
@@ -206,169 +215,406 @@ const SESSIONS = [
     notes:"EMOM hybride format Hyrox — 1 min ON / 20 s OFF, 2 blocs de 4 items ×3 tours (rameur/vélo ergo/SkiErg/squat haltère 20 ; smashball burpees 10/box step/hang clean/sled push), 1 min OFF inter-blocs. Rameur+SkiErg+sled push = 3 stations Hyrox directes, hang clean dos droit = transfert hip hinge. Zone reine Z4 87 % (28,7 min), 0 % sous 167 : les OFF de 20 s ne font pas redescendre la FC (plancher ~163-164) → stimulus de répétabilité sous fatigue, pile le chantier n°1. TRIMP 91, ~522 kcal. ⚠️ Conditions dégradées : clim en panne, salle bondée, 34°C ext → FC et RPE biaisés à la hausse (coût thermique). RPE annoncé 9 gonflé par la chaleur, sur charge sèche ~8-8,5 (cf. 19/06). 2ᵉ grosse piqûre qualité de la semaine (seuil 01/07 TRIMP 80 + celle-ci) → prochaine séance = Z2 facile plafond 152 ou repos. Données montre." }
 ];
 
-/* Tests dédiés (pas des séances) — repères qui se mettent à jour seuls quand tu en logges un nouveau */
 const TESTS = [
   { date:"2026-06-18", type:"seuil", allure:"4'55–5'05", fcLo:178, fcHi:182,
     notes:"Test tapis — seuil ~4'55-5'05/km @ 178-182. Bande Z4 167-181 validée." }
 ];
 
-/* Référence officielle — Hyrox Open Men Solo, nov. 2025 (benchmark de départ / profil) */
 const REFERENCE_OPEN = {
   date:"2025-11", format:"Open Men Solo",
   fcMoy:181, trimp:277, pctZ4plus:96, deriveBpm:11,
   notes:"96% du temps de course en Z4+, FC moy 181 bpm. Dérive +11 bpm sur les 8 runs, allure tenue jusqu'à R7. R8 : effondrement d'allure = crampes neuromusculaires (départ trop agressif après les fentes sandbag), pas une défaillance aérobie. Poste rameur = anomalie FC ~168 bpm (levier de récup potentiel à reproduire)."
 };
 
-/* libellés modules */
+/* Les 8 phases du Plan v2 (dates 2026). NOUVEAU en V3 : sert la timeline + la décision du jour. */
+const PHASES = [
+  { n:1, nom:"Fondation + hypertrophie", debut:"2026-06-17", lieu:"Maison",
+    focus:"Muscle haut du corps + base course + technique pull." },
+  { n:2, nom:"Maintien voyage — Club Med", debut:"2026-06-29", lieu:"Club Med",
+    focus:"3 courses faciles Z2 + 1 amorce seuil (4×800 m) + 2 full-body haltères & tractions." },
+  { n:3, nom:"Relance", debut:"2026-07-05", lieu:"Maison",
+    focus:"1ᵉʳ vrai seuil (4×1 km) + retour sled + intro course compromise douce." },
+  { n:4, nom:"Maintien voyage — Calvi", debut:"2026-07-14", lieu:"Calvi",
+    focus:"2 courses faciles + nage. Décharge = surcompensation." },
+  { n:5, nom:"Force / puissance + seuil", debut:"2026-07-18", lieu:"Maison",
+    focus:"Dernier bloc lourd + pliométrie + seuil installé (5-6×1 km)." },
+  { n:6, nom:"Base aérobie + seuil — Maurice", debut:"2026-07-30", lieu:"Maurice",
+    focus:"Volume course Z2 4-5×/sem + 1 seuil/sem + 1 sortie longue + kite. Chaleur : tôt/tard, électrolytes." },
+  { n:7, nom:"Spécifique / pic", debut:"2026-09-03", lieu:"Maison",
+    focus:"2 simulations/sem + endurance de force + seuil jambes fatiguées." },
+  { n:8, nom:"Affûtage + pic", debut:"2026-09-22", lieu:"Maison",
+    focus:"Taper 14 j : volume course -50/-60%, force -30/-50% (charges lourdes gardées), carb-up." }
+];
+
 const MOD = { m1:"M1 facile", m2:"M2 seuil", m3:"M3 compromise",
   m4:"M4 haut", m5:"M5 jambes", m6:"M6 endur.-force", kite:"Kite (croisé)" };
 
 /* ============================================================
-   SILO 2 — FORMULES (fonctions pures : entrée → sortie, zéro effet de bord)
-   C'est ici que vivront les diagnostics. Testable, remplaçable.
+   SILO 2 — FORMULES (fonctions pures : entrée → sortie)
    ============================================================ */
 const RESERVE = PROFIL.fcMax - PROFIL.fcRepos;
+const J = d => new Date(d);
+const jour = d => J(d).toISOString().slice(0,10);
+const joursEntre = (a,b) => (J(b)-J(a))/864e5;
 
-function ef(s){                                      // efficiency factor, m/min/bpm
-  // override possible : EF calculé sur le segment steady (efKm/efMin/efFc), sinon séance entière
+function ef(s){
   const dist=s.efKm??s.distanceKm, dur=s.efMin??s.dureeMin, fc=s.efFc??s.fcMoy;
   if(!dist || !fc) return null;
   return ((dist*1000)/dur)/fc;
 }
-function hrr(fc){ return (fc - PROFIL.fcRepos)/RESERVE; }   // % réserve (0–1)
+function hrr(fc){ return (fc - PROFIL.fcRepos)/RESERVE; }
+function trimp(s){ const r=hrr(s.fcMoy); return s.dureeMin * r * 0.64 * Math.exp(1.92*r); }
+/* NOUVEAU V3 : charge sRPE = RPE × durée. Capte la charge mécanique/neuro que le TRIMP (cardiaque) sous-évalue.
+   Les RPE sont déjà dans les données → gratuit. Null si pas de RPE (footings faciles, kite). */
+function srpe(s){ return s.rpe!=null ? s.rpe * s.dureeMin : null; }
 
-function trimp(s){                                   // Banister, pondéré exponentiel
-  const r = hrr(s.fcMoy);
-  return s.dureeMin * r * 0.64 * Math.exp(1.92*r);
-}
-function ewma(series, tau){                          // moyenne mobile exponentielle
+function ewma(series, tau){
   const lambda = 1 - Math.exp(-1/tau);
-  let v = 0; const out = [];
-  for(const x of series){ v = v + (x - v)*lambda; out.push(v); }
+  let v=0; const out=[];
+  for(const x of series){ v = v + (x-v)*lambda; out.push(v); }
   return out;
 }
-function dailyLoad(sessions, from, to){              // TRIMP agrégé par jour
-  const days = []; const d = new Date(from);
-  while(d <= to){ days.push(d.toISOString().slice(0,10)); d.setDate(d.getDate()+1); }
-  return days.map(day => {
-    let load = 0;
-    for(const s of sessions) if(s.date===day) load += trimp(s);
+function dailyLoad(sessions, from, to){
+  const days=[]; const d=new Date(from);
+  while(d<=to){ days.push(jour(d)); d.setDate(d.getDate()+1); }
+  return days.map(day=>{
+    let load=0; for(const s of sessions) if(s.date===day) load += trimp(s);
     return { day, load };
   });
 }
-function pmc(sessions){                              // CTL(42j)=fitness, ATL(7j)=fatigue, TSB=forme
+function pmc(sessions){
   if(!sessions.length) return null;
-  const from = new Date(sessions[0].date);
+  const from = J(sessions[0].date);
   const series = dailyLoad(sessions, from, AUJ);
   const loads = series.map(x=>x.load);
-  const ctl = ewma(loads,42), atl = ewma(loads,7);
-  const i = series.length-1;
-  return { series, ctl, atl,
-    fitness:ctl[i], fatigue:atl[i], forme:ctl[i]-atl[i],
-    fiable: series.length >= 28 && sessions.length >= 12 };  // honnête : 4 sem ET assez dense
+  const ctl=ewma(loads,42), atl=ewma(loads,7);
+  const i=series.length-1;
+  return { series, ctl, atl, fitness:ctl[i], fatigue:atl[i], forme:ctl[i]-atl[i],
+    fiable: series.length>=28 && sessions.length>=12 };
 }
-function acwr(sessions){                              // aigu 7j : chronique 28j
-  const a = dailyLoad(sessions, new Date(AUJ.getTime()-6*864e5), AUJ)
-            .reduce((s,x)=>s+x.load,0)/7;
-  const c = dailyLoad(sessions, new Date(AUJ.getTime()-27*864e5), AUJ)
-            .reduce((s,x)=>s+x.load,0)/28;
-  const joursData = (AUJ - new Date(sessions[0].date))/864e5;
-  const nb28 = sessions.filter(s=>(AUJ - new Date(s.date))/864e5 <= 27).length;
-  return { ratio: c>0 ? a/c : null, fiable: joursData >= 28 && nb28 >= 8 };  // besoin d'un socle chronique dense, pas juste 28 j d'ancienneté
+function acwr(sessions){
+  const a = dailyLoad(sessions, new Date(AUJ.getTime()-6*864e5), AUJ).reduce((s,x)=>s+x.load,0)/7;
+  const c = dailyLoad(sessions, new Date(AUJ.getTime()-27*864e5), AUJ).reduce((s,x)=>s+x.load,0)/28;
+  const joursData = joursEntre(sessions[0].date, AUJ);
+  const nb28 = sessions.filter(s=>joursEntre(s.date,AUJ)<=27).length;
+  return { ratio: c>0 ? a/c : null, fiable: joursData>=28 && nb28>=8 };
 }
-function chargeParTheme(sessions){                   // TRIMP groupé par module (via tag type)
-  const out = {};
-  for(const s of sessions){ out[s.type] = (out[s.type]||0) + trimp(s); }
+/* Charge par thème, kite exclu (charge croisée, pas un stimulus Hyrox) — NOUVEAU V3 */
+function chargeParTheme(sessions){
+  const out={};
+  for(const s of sessions){ if(s.type==="kite") continue; out[s.type]=(out[s.type]||0)+trimp(s); }
   return out;
 }
-function coursePoints(){                              // EF de chaque footing, en semaines depuis le départ
-  if(!SESSIONS.length) return [];
-  const start = new Date(SESSIONS.reduce((m,s)=> s.date<m?s.date:m, SESSIONS[0].date));
-  return SESSIONS.filter(s=>s.tags && s.tags.includes("steady") && s.distanceKm && ef(s)!=null)
-    .map(s=>({ week:(new Date(s.date)-start)/(7*864e5), ef:ef(s), date:s.date }))
+function chargeKite(sessions){ return sessions.filter(s=>s.type==="kite").reduce((a,s)=>a+trimp(s),0); }
+
+/* CORRIGÉ (bug V2) : renvoie la course la PLUS RÉCENTE (pas la première du tableau). */
+function repereM1(){
+  const m1 = SESSIONS.filter(x=>x.type==="m1" && x.distanceKm);
+  return m1.length ? m1[m1.length-1] : null;
+}
+/* Points EF séparés par condition (outdoor vs tapis/indoor) — évite de mélanger des EF non comparables. */
+function coursePoints(condition){
+  const start = J(SESSIONS.reduce((m,s)=> s.date<m?s.date:m, SESSIONS[0].date));
+  const estTapis = s => s.tags.includes("tapis")||s.tags.includes("indoor");
+  return SESSIONS
+    .filter(s=>s.tags.includes("steady") && s.distanceKm && ef(s)!=null)
+    .filter(s=> condition==="tapis" ? estTapis(s) : !estTapis(s))
+    .map(s=>({ week:joursEntre(start,s.date)/7, ef:ef(s), date:s.date }))
     .sort((a,b)=>a.week-b.week);
 }
-function dernierSeuil(){                              // dernier test de seuil loggé
-  return TESTS.filter(t=>t.type==="seuil").slice(-1)[0] || null;
-}
-function dernierDecouplage(){                          // dernière séance avec dérive Pa:HR mesurée
+function dernierSeuil(){ return TESTS.filter(t=>t.type==="seuil").slice(-1)[0] || null; }
+/* Séances seuil (Z4) et compromise — regroupées in+out car pilotées par la FC. */
+function seuilSessions(){ return SESSIONS.filter(s=>s.type==="m2"||(s.tags&&s.tags.includes("seuil"))).sort((a,b)=>a.date<b.date?1:-1); }
+function compromiseSessions(){ return SESSIONS.filter(s=>s.type==="m3"||(s.tags&&s.tags.includes("compromise"))).sort((a,b)=>a.date<b.date?1:-1); }
+function dernierDecouplage(){
   return SESSIONS.filter(s=>s.decouplagePct!=null).sort((a,b)=>a.date<b.date?1:-1)[0] || null;
+}
+function phaseActuelle(){
+  let cur=PHASES[0];
+  for(const p of PHASES){ if(J(p.debut) <= AUJ) cur=p; }
+  return cur;
+}
+/* NOUVEAU V3 — la brique du compagnon : "quoi faire aujourd'hui + suis-je frais ?".
+   Heuristique honnête et simple : compte les grosses piqûres qualité récentes. */
+function seancesDures(sessions, jours){
+  return sessions.filter(s=>{
+    const d = joursEntre(s.date, AUJ);
+    if(d<0 || d>jours) return false;
+    const z45 = (s.zonesMin?(s.zonesMin.z4||0)+(s.zonesMin.z5||0):0);
+    return (s.rpe!=null && s.rpe>=8) || z45>=12;   // dur = RPE≥8 OU ≥12 min en Z4+Z5
+  });
+}
+/* Séance qualité type de chaque phase (le "programme" quand tu es frais). */
+const SEANCE_PHASE = {
+  1:"Haut du corps (M4) — développés haltères + tractions + gainage anti-extension.",
+  2:"Course facile Z2 30-40 min, OU amorce seuil 4×800 m. + ceinture profonde 10 min.",
+  3:"Seuil M2 — 4×1 km à l'allure seuil, récup 90 s. + technique sled pull.",
+  4:"Course facile 30 min + nage (décharge).",
+  5:"Sled puissance — pushes lourds courts explosifs + hinge KB + pliométrie.",
+  6:"Sortie longue 60-75 min avec 2×12 min au seuil en fin de séance.",
+  7:"Simulation partielle — course + 3-4 stations au poids Pro, dans l'ordre.",
+  8:"Séance courte allure course + activation (affûtage)."
+};
+/* Prochain entraînement : date + programme concret. La fraîcheur (charge récente réelle)
+   module le programme : récup imposée si 2 grosses piqûres en 3 j. */
+function prochainEntrainement(){
+  const dures3 = seancesDures(SESSIONS,3);
+  const dures1 = seancesDures(SESSIONS,1);
+  const ph = phaseActuelle();
+  const dateLabel = AUJ.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+  if(dures1.length>=1 || dures3.length>=2){
+    return { mode:"rest", dateLabel, prog:"Récup — Z2 facile (plafond 152 bpm) ou repos complet.",
+      note:`Charge qualité lourde récente (${dures3.length} piqûre(s) en 3 j). On ne s'empile pas — prochaine séance qui compte : pas avant demain.` };
+  }
+  if(dures3.length===1){
+    return { mode:"easy", dateLabel, prog:"Footing Z2, technique sled ou mobilité.",
+      note:`1 séance dure dans les 3 jours. Garde une qualité pour dans 1-2 jours.` };
+  }
+  return { mode:"go", dateLabel, prog:SEANCE_PHASE[ph.n]||ph.focus,
+    note:`Bien reposé — feu vert pour une séance qui compte (focus phase ${ph.n}).` };
 }
 
 /* ============================================================
-   SILO 3 — RENDU (une fonction par page ; uniquement de l'affichage)
+   SILO 3 — RENDU (une fonction par page)
    ============================================================ */
 const PAGES = [
-  {id:"p-global", tab:"Global", render:renderGlobal},
-  {id:"p-course", tab:"Course", render:renderCourse},
-  {id:"p-force",  tab:"Force",  render:renderForce},
-  {id:"p-charge", tab:"Charge & forme", render:renderCharge},
-  {id:"p-risque", tab:"Risque", render:renderRisque},
-  {id:"p-strat",  tab:"Stratégie", render:renderStrat}
+  {id:"p-jour",   tab:"Aujourd'hui", render:renderJour},
+  {id:"p-course", tab:"Course",      render:renderCourse},
+  {id:"p-dura",   tab:"Durabilité",  render:renderDura},
+  {id:"p-charge", tab:"Charge",      render:renderCharge},
+  {id:"p-force",  tab:"Force",       render:renderForce},
+  {id:"p-plan",   tab:"Plan",        render:renderPlan}
 ];
 
 function fmt(n,d=2){ return n==null||isNaN(n) ? "—" : Number(n).toFixed(d); }
 function allurePace(km,min){ const s=min/km*60; return Math.floor(s/60)+"'"+String(Math.round(s%60)).padStart(2,"0"); }
-function repereM1(){ return SESSIONS.find(x=>x.type==="m1" && x.distanceKm); }  // séance de course = repère EF
 
-/* anneau de jauge SVG : value=null → calibration (anneau neutre) */
-function ringSVG(value){
-  const r=30, c=2*Math.PI*r, off = value==null ? c : c*(1-value);
-  const col = value==null ? "var(--line)" : "var(--accent)";
-  const dash = value==null ? "4 6" : "none";
-  const center = value==null ? "—" : Math.round(value*100)+"%";
-  return `<svg viewBox="0 0 80 80" width="78" height="78">
-    <circle cx="40" cy="40" r="${r}" fill="none" stroke="var(--line)" stroke-width="7"/>
-    <circle cx="40" cy="40" r="${r}" fill="none" stroke="${col}" stroke-width="7"
-      stroke-dasharray="${dash==="none"?c:dash}" stroke-dashoffset="${dash==="none"?off:0}"
-      stroke-linecap="round" transform="rotate(-90 40 40)"/>
-    <text x="40" y="45" text-anchor="middle" font-size="15" font-weight="600" fill="var(--txt)">${center}</text>
-  </svg>`;
-}
-function gauge(name, value, sub){
-  return `<div class="gauge">${ringSVG(value)}
-    <div class="gn">${name}</div><div class="gs">${sub}</div></div>`;
-}
-
-function renderGlobal(){
+/* ---------- PAGE 1 : AUJOURD'HUI (compagnon) ---------- */
+function renderJour(){
+  const dj = prochainEntrainement();
+  const ph = phaseActuelle();
   const p = pmc(SESSIONS), a = acwr(SESSIONS);
-  const themeG = chargeParTheme(SESSIONS);
-  const totalG = Object.values(themeG).reduce((x,y)=>x+y,0);
-  const domG = Object.entries(themeG).sort((x,y)=>y[1]-x[1])[0] || ["",0];
-  const domLabel = MOD[domG[0]] || domG[0];
-  const domShare = totalG ? Math.round(domG[1]/totalG*100) : 0;
-  const formeState = p && p.fiable ? (p.forme>=-10?"ok":"warn") : "";
-  const formePill  = p && p.fiable ? (p.forme>=0?"frais":"chargé") : "amorçage";
-  const acwrPill   = a.fiable ? fmt(a.ratio,2) : "calibration";
   const dd = dernierDecouplage();
-  const durState = dd ? (dd.decouplagePct < CIBLES.decouplagePct ? "ok" : "warn") : "";
-  const durPill  = dd ? fmt(dd.decouplagePct,1)+"%" : "à mesurer";
+
+  // stat 1 : EF actuel (course la plus récente) + tendance vs course précédente même condition
+  const s = repereM1();
+  const efNow = s?ef(s):null;
+  const outdoor = coursePoints("outdoor");
+  const trend = outdoor.length>=2 ? outdoor[outdoor.length-1].ef - outdoor[outdoor.length-2].ef : null;
+  const arrow = trend==null?"":(trend>0.005?"<span class='sarrow up'>▲</span>":trend<-0.005?"<span class='sarrow down'>▼</span>":"<span class='sarrow flat'>▬</span>");
+
+  // stat 2 : découplage
+  const durOk = dd && dd.decouplagePct < CIBLES.decouplageCible;
+  // stat 3 : forme
+  const formeTxt = p.fiable ? fmt(p.forme,0) : "—";
+  const formeCls = p.fiable ? (p.forme>=0?"up":p.forme>=-15?"flat":"down") : "flat";
+
+  // feux de risque
+  const acwrVal = a.fiable ? a.ratio : null;
+  const acwrCls = acwrVal==null?"":(acwrVal>1.5?"bad":acwrVal>=0.8&&acwrVal<=1.3?"ok":"warn");
+  const acwrTxt = acwrVal==null?"calibration":fmt(acwrVal,2);
+
   return `
-  <h2>Vue globale</h2>
-  <div class="verdict">${SESSIONS.length} séances loggées · charge la plus lourde : <b>${domLabel}</b> (${domShare}%). Décrochage aérobie déjà mesuré le 25/06 (<b>${dd?fmt(dd.decouplagePct,1):"—"}%</b>, sous la cible). Prochaine donnée structurante : <b>PFT T1</b> + <b>test seuil calibré</b> (conditions neutres).</div>
+  <div class="today ${dj.mode}">
+    <p class="kick">Prochain entraînement · Phase ${ph.n} — ${ph.lieu}</p>
+    <p class="big">${dj.dateLabel}</p>
+    <p class="sub"><b>${dj.prog}</b><br><span style="color:var(--hint)">${dj.note}</span></p>
+  </div>
+
+  <div class="trio">
+    <div class="stat"><div class="sv">${fmt(efNow,3)} ${arrow}</div><div class="sl">EF actuel</div></div>
+    <div class="stat"><div class="sv">${dd?fmt(dd.decouplagePct,1)+"<small>%</small>":"—"}</div><div class="sl">Découplage</div></div>
+    <div class="stat"><div class="sv ${formeCls}">${formeTxt}</div><div class="sl">Forme (TSB)</div></div>
+  </div>
+
   <div class="card">
-    <p class="lbl">Décision du jour — 3 feux</p>
-    <div class="row"><span class="dot ${durState}"></span>
-      <span class="nm">Durabilité <small>· décrochage</small></span>
-      <span class="pill">${durPill}</span></div>
-    <div class="row"><span class="dot ${formeState}"></span>
-      <span class="nm">Fraîcheur <small>· forme (TSB)</small></span>
-      <span class="pill">${formePill}</span></div>
-    <div class="row"><span class="dot"></span>
-      <span class="nm">Risque <small>· ACWR</small></span>
-      <span class="pill">${acwrPill}</span></div>
+    <p class="lbl">Feux — avant de charger</p>
+    <div class="row"><span class="dot ${durOk?"ok":dd?"warn":""}"></span>
+      <span class="nm">Durabilité <small>· découplage aérobie</small></span>
+      <span class="pill ${durOk?"ok":dd?"warn":""}">${dd?fmt(dd.decouplagePct,1)+"% ":"à mesurer"}</span></div>
+    <div class="row"><span class="dot ${formeCls==="up"?"ok":formeCls==="down"?"bad":"warn"}"></span>
+      <span class="nm">Fraîcheur <small>· forme TSB</small></span>
+      <span class="pill">${p.fiable?(p.forme>=0?"frais":"chargé"):"amorçage"}</span></div>
+    <div class="row"><span class="dot ${acwrCls}"></span>
+      <span class="nm">Risque blessure <small>· ACWR</small></span>
+      <span class="pill ${acwrCls}">${acwrTxt}</span></div>
+    <div class="row"><span class="dot warn"></span>
+      <span class="nm">Mollets excentriques <small>· sécurité Achille</small></span>
+      <span class="pill warn">0/3 sem.</span></div>
   </div>
-  <p class="lbl" style="margin:4px 2px 8px;color:var(--dim);font-size:12px">Jauges — % de la cible Pro</p>
-  <div class="gauges">
-    ${gauge("Global", null, "rollup des 3")}
-    ${gauge("Moteur", null, "EF "+fmt(ef(repereM1()),2)+" → cible "+CIBLES.ef)}
-    ${gauge("Course", null, "tenir "+CIBLES.allureCourse+" fatigué")}
-    ${gauge("Stations", null, "PFT → sub-25 min")}
+
+  <div class="verdict">Cap : <b>Hyrox Pro le 02/10</b> · J−${Math.max(0,Math.ceil(joursEntre(AUJ,RACE)))}. Le spécifique = <b>courir fatigué entre des stations</b> (effort Z3–début Z4), pas « 80% facile ». Trois chantiers : <b>durabilité aérobie</b>, <b>endurance de force</b>, <b>tenir l'allure fatigué</b>.</div>`;
+}
+
+/* ---------- PAGE 2 : COURSE (EF séparé par condition) ---------- */
+function renderCourse(){
+  const s = repereM1();
+  const ts = dernierSeuil();
+  const seuils = seuilSessions();
+  const comp = compromiseSessions();
+  const seuilRows = seuils.slice(0,3).map(x=>{
+    const io = x.tags.includes("tapis")||x.tags.includes("indoor")?"in":"out";
+    return `<tr><td>${x.date.slice(8)}/${x.date.slice(5,7)} <small style="color:var(--hint)">${io}</small></td><td>FC ${x.fcMoy} / ${x.fcMax} · Z4 ${Math.round(x.zonesMin.z4||0)}′</td></tr>`;
+  }).join("") || `<tr><td>—</td><td>en attente</td></tr>`;
+  return `
+  <div class="verdict">Règle in/out : <b>piloté par la FC → on regroupe</b> (un battement = un battement) · <b>basé sur l'allure → tapis et outdoor séparés</b> (pente/surface ≠ plat ; et le tapis du Club Med fausse la distance +30%). La FC, elle, reste juste partout.</div>
+
+  <div class="card">
+    <p class="lbl">1 · EF — économie <small style="color:var(--hint)">(allure ÷ FC → in/out séparés)</small></p>
+    ${efChartSVG()}
+    <div class="zleg" style="margin-top:8px">
+      <span><i style="background:#2BD9D2"></i>bande cible</span>
+      <span><i style="background:#2FD27A"></i>outdoor (référence)</span>
+      <span><i style="background:#FF7A1A"></i>tapis (indicatif)</span></div>
+    <p class="muted" style="margin-top:8px">Outdoor = ligne de référence (GPS fiable). Tapis sur sa propre ligne (pente/surface différentes) ; ceux du Club Med sur-estiment +30% → points indicatifs. Un tapis fiable (maison) donne une distance juste — il rejoindra sa ligne tapis, pas l'outdoor. Point outdoor récent : <b>${s?fmt(ef(s),3):"—"}</b> @ ${s?s.fcMoy:"—"} bpm. À FC égale, l'allure doit descendre — marqueur n°1.</p>
   </div>
-  <p class="muted" style="margin-top:10px">En calibration : une jauge de progression a besoin de
-    plusieurs points (et des tests décrochage / PFT) avant d'afficher un %. Formule du dénominateur
-    à amender ensemble.</p>
-  <div class="card" style="margin-top:12px">
+
+  <div class="card">
+    <p class="lbl">2 · Seuil — zone reine <small style="color:var(--hint)">(piloté FC → in+out confondus)</small></p>
+    <table class="refs">${seuilRows}</table>
+    <table class="refs" style="margin-top:2px">
+      <tr><td>Allure test (${ts?ts.date.slice(8)+"/"+ts.date.slice(5,7):"—"})</td><td>${ts?ts.allure+" @ "+ts.fcLo+"–"+ts.fcHi:"—"} <small style="color:var(--hint)">indic.</small></td></tr>
+      <tr><td>Cible course (fatigué)</td><td>${CIBLES.allureCourse}/km</td></tr></table>
+    <p class="muted" style="margin-top:8px">Les séances seuil se lisent au <b>bpm</b> (temps en Z4, dérive) → tapis et outdoor sur la même liste. Seule l'<i>allure</i> reste indicative tant que le test seuil <b>outdoor GPS</b> n'est pas fait.</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">3 · Course compromise — le différenciateur</p>
+    ${comp.length
+      ? `<table class="refs">${comp.slice(0,3).map(x=>`<tr><td>${x.date.slice(8)}/${x.date.slice(5,7)}</td><td>FC ${x.fcMoy} / ${x.fcMax}</td></tr>`).join("")}</table>`
+      : `<p class="muted">Aucune séance dédiée loggée. À démarrer <b>maintenant</b> (audit) : <code>500 m allure course → 1 station → 500 m</code>, sans pause. Tag <code>#compromise</code> → suivi de la <b>dégradation d'allure run-à-run</b> ici.</p>`}
+    <p class="muted" style="margin-top:8px">Rappel jour J : run 1 contrôlé, variance ≤ 15 s/km, roxzone en mouvement. Ton R8 nov. = départ trop agressif → discipline + électrolytes.</p>
+  </div>`;
+}
+
+/* ---------- PAGE 3 : DURABILITÉ (nouveau panneau dédié) ---------- */
+function renderDura(){
+  const dd = dernierDecouplage();
+  const seuils = SESSIONS.filter(s=>s.type==="m2");
+  const seuilRows = seuils.map(s=>`<tr><td>${s.date.slice(8)+"/"+s.date.slice(5,7)}</td><td>FC ${s.fcMoy} moy / ${s.fcMax} max</td></tr>`).join("") || `<tr><td>—</td><td>en attente</td></tr>`;
+  return `
+  <div class="verdict">La <b>durabilité</b> (résistance à la dérive FC) est ton signal n°1, validé par la science Hyrox. On la lit par le <b>découplage aérobie</b> : si la FC grimpe alors que l'allure ne bouge pas, la base lâche.</div>
+  <div class="card">
+    <p class="lbl">Découplage aérobie (Pa:HR)</p>
+    ${dd?`<div class="trio" style="grid-template-columns:1fr 1fr">
+      <div class="stat"><div class="sv ${dd.decouplagePct<CIBLES.decouplageCible?"up":"flat"}">${fmt(dd.decouplagePct,1)}<small>%</small></div><div class="sl">dernier (${dd.date.slice(8)}/${dd.date.slice(5,7)})</div></div>
+      <div class="stat"><div class="sv">&lt;5<small>%</small></div><div class="sl">cible (idéal)</div></div></div>
+      <p class="muted" style="margin-top:8px">${dd.notes}</p>`
+    :`<p class="muted">En attente d'un test standard.</p>`}
+    <div class="fx">découplage % = (EF 1ʳᵉ moitié − EF 2ᵉ moitié) ÷ EF 1ʳᵉ moitié × 100</div>
+    <p class="muted">Cible science : <b>&lt; 5%</b> = base aérobie solide · 5–8% = en développement · &gt; 8% = base à renforcer. Protocole retest : tapis 2%, 6'10/km, 60 min, nutrition & conditions fixées.</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Dérive FC — séances seuil (M2)</p>
+    <table class="refs">${seuilRows}</table>
+    <p class="muted" style="margin-top:8px">Le 01/07 : dérive 154→178 bpm sur les blocs, plancher de récup qui monte 137→154. C'est la signature du chantier durabilité — on veut voir cet écart se réduire au fil des semaines.</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Comment on la construit</p>
+    <p class="muted">Volume Z1/Z2 (socle) + <b>sorties longues avec 2-3×10-15 min au seuil dans le dernier tiers</b> + transitions station→course pré-fatiguées. Adaptations : mitochondries (dès 2 sem), capillaires (~4 sem), oxydation lipidique. Fenêtre de 10 sem = -3 à -4 pts de découplage attendus.</p>
+  </div>`;
+}
+
+/* ---------- PAGE 4 : CHARGE (TRIMP + sRPE + kite séparé) ---------- */
+function renderCharge(){
+  const p = pmc(SESSIONS);
+  const theme = chargeParTheme(SESSIONS);       // kite déjà exclu
+  const total = Object.values(theme).reduce((a,b)=>a+b,0) || 1;
+  const kite = chargeKite(SESSIONS);
+  const themeRows = Object.entries(theme).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
+    <div class="theme"><span class="tn">${MOD[k]||k}</span>
+      <span class="tt"><span style="width:${Math.round(v/total*100)}%"></span></span>
+      <span class="tv">${Math.round(v)}</span></div>`).join("");
+  // charge sRPE totale (semaine glissante) — capte la charge mécanique
+  const srpe7 = SESSIONS.filter(s=>joursEntre(s.date,AUJ)<=6 && srpe(s)!=null).reduce((a,s)=>a+srpe(s),0);
+  const trimp7 = SESSIONS.filter(s=>joursEntre(s.date,AUJ)<=6).reduce((a,s)=>a+trimp(s),0);
+  return `
+  <div class="card">
+    <p class="lbl">PMC — fitness / fatigue / forme</p>
+    ${pmcChartSVG(p)}
+    <table class="refs" style="margin-top:8px">
+      <tr><td>Fitness (CTL, 42j)</td><td>${fmt(p.fitness,1)}</td></tr>
+      <tr><td>Fatigue (ATL, 7j)</td><td>${fmt(p.fatigue,1)}</td></tr>
+      <tr><td>Forme (TSB)</td><td>${fmt(p.forme,1)}</td></tr></table>
+    ${p.fiable?"":`<p class="amorce">⚠ Amorçage — fiable après ~4 semaines d'accumulation dense.</p>`}
+  </div>
+  <div class="card">
+    <p class="lbl">Charge 7 j — 2 lectures complémentaires</p>
+    <div class="trio" style="grid-template-columns:1fr 1fr">
+      <div class="stat"><div class="sv">${Math.round(trimp7)}</div><div class="sl">TRIMP (cardiaque)</div></div>
+      <div class="stat"><div class="sv">${Math.round(srpe7)}</div><div class="sl">sRPE (mécanique)</div></div>
+    </div>
+    <p class="muted" style="margin-top:8px">Le TRIMP mesure la charge <b>cardiaque</b> ; il sous-évalue le lourd/sled (FC modérée, stress mécanique fort). La charge <b>sRPE = RPE × durée</b> comble cet angle mort. Deux lignes = image honnête de la fatigue réelle.</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Charge par module Hyrox (TRIMP, kite exclu)</p>
+    ${themeRows}
+    <p class="muted" style="margin-top:8px">Kite = <b>${Math.round(kite)}</b> de charge croisée, sortie du signal Hyrox (fatigue de fond, pas un stimulus spécifique). Avant, il écrasait le graphe et masquait ce que tu bosses vraiment.</p>
+  </div>`;
+}
+
+/* ---------- PAGE 5 : FORCE ---------- */
+function renderForce(){
+  return `
+  <div class="card">
+    <p class="lbl">Références de travail</p>
+    <table class="refs">
+      <tr><td>Banc plat</td><td>24 kg</td></tr>
+      <tr><td>Banc incliné</td><td>20 kg</td></tr>
+      <tr><td>Tractions</td><td>3×5 PdC</td></tr>
+      <tr><td>Rowing haltère</td><td>16 kg · 4×8/bras</td></tr>
+    </table>
+    <p class="muted" style="margin-top:8px">Force de pointe = réglée (maintenance). Prise de masse contre-productive (8 km + charges fixes).</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Économie de course — à ajouter (audit)</p>
+    <p class="muted"><b>Pliométrie 2×/sem</b> (sauts, bondissements) + force jambes <b>lourde ≥80% 1RM</b> → +2 à 5% d'économie sur 8-14 sem, <b>sans masse</b>. Les charges moyennes (40-79% 1RM) : effet nul. + confirmer une chaussure à plaque carbone pour la course (Deviate Nitro 3 → +2,5-4% gratuits).</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Sled</p>
+    <p class="muted">Pull = technique avant charge (jambes en synchro, pas le dos). Push = entretien, ne jamais laisser le traîneau s'arrêter, micro-pause à mi-longueur.</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Endurance stations — PFT (T1)</p>
+    <table class="refs">
+      <tr><td>1000m / 50 BBJ / 100 fentes / 1000m row / 30 pompes / 100 WB</td><td>—</td></tr>
+      <tr><td>Cible</td><td>sub-25 min</td></tr></table>
+    <p class="amorce">⚠ T1 à faire avant la fin du Club Med — pose le 1ᵉʳ repère stations.</p>
+  </div>`;
+}
+
+/* ---------- PAGE 6 : PLAN (timeline 8 phases) ---------- */
+function renderPlan(){
+  const cur = phaseActuelle();
+  const tl = PHASES.map(p=>{
+    const debut = J(p.debut);
+    const fin = PHASES.find(x=>x.n===p.n+1);
+    const finD = fin?J(fin.debut):RACE;
+    const cls = p.n===cur.n ? "now" : (finD<=AUJ ? "done" : "");
+    const d = `${p.debut.slice(8)}/${p.debut.slice(5,7)}`;
+    return `<div class="tlp ${cls}">
+      <span class="tln">${p.n}</span>
+      <span class="tlname">${p.nom}</span>
+      <span class="tldate">${d}</span></div>`;
+  }).join("");
+  return `
+  <div class="card">
+    <p class="lbl">Les 8 phases — où tu en es</p>
+    <div class="tl">${tl}</div>
+  </div>
+  <div class="card">
+    <p class="lbl">Focus phase ${cur.n} — ${cur.lieu}</p>
+    <p class="muted">${cur.focus}</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Distribution d'intensité (recalé — audit)</p>
+    <p class="muted">Ton limiteur = <b>seuil + durabilité</b>, pas le VO2max → le modèle optimal n'est pas « polarisé pur » mais <b>pyramidal en base (beaucoup de Z2 + densité seuil) puis polarisé au pic</b>. La science montre que le polarisé n'aide pas le seuil. Le Z2 reste le socle (durabilité + récup) ; le spécifique Hyrox vit en Z3-début Z4.</p>
+  </div>
+  <div class="card">
+    <p class="lbl">Priorité audit — course compromise plus tôt</p>
+    <p class="muted">C'est LE différenciateur (59% du temps de course = courir fatigué). À introduire <b>dès maintenant</b>, léger : « 500 m allure course → 1 station poids course → 500 m », <b>sans pause shake-out</b> (la pause détruit l'état compromis). Montée en charge Phases 5-7.</p>
+  </div>
+  <div class="card">
     <p class="lbl">Référence — Open Men Solo · nov. 2025</p>
     <table class="refs">
       <tr><td>FC moyenne course</td><td>${REFERENCE_OPEN.fcMoy} bpm</td></tr>
@@ -380,191 +626,36 @@ function renderGlobal(){
   </div>`;
 }
 
-function renderCourse(){
-  const s = repereM1();                               // la M1 = repère aérobie
-  const ts = dernierSeuil();
-  const dd = dernierDecouplage();                     // dernière dérive Pa:HR mesurée
-  return `
-  <h2>Course</h2>
-  <div class="card">
-    <p class="lbl">EF — réel vs trajectoire cible</p>
-    ${efChartSVG()}
-    <div class="zleg" style="margin-top:8px">
-      <span><i style="background:var(--target)"></i>bande cible (+4 à +7%)</span>
-      <span><i style="background:var(--real)"></i>réel</span></div>
-    <p class="muted" style="margin-top:8px">Point actuel : EF ${fmt(ef(s),3)} m/min/bpm @ ${s.fcMoy} bpm
-      (${allurePace(s.distanceKm,s.dureeMin)}/km). À FC égale, l'allure doit descendre — marqueur n°1.</p>
-  </div>
-  <div class="card">
-    <p class="lbl">Allure seuil</p>
-    <table class="refs"><tr><td>Dernier test (${ts ? ts.date.slice(8)+"/"+ts.date.slice(5,7) : "—"})</td><td>${ts ? ts.allure+" @ "+ts.fcLo+"–"+ts.fcHi : "—"}</td></tr>
-      <tr><td>Cible course (fatigué)</td><td>${CIBLES.allureCourse}/km</td></tr></table>
-  </div>
-  <div class="card">
-    <p class="lbl">Décrochage aérobie (Pa:HR)</p>
-    ${dd ? `<table class="refs"><tr><td>Dernier test (${dd.date.slice(8)+"/"+dd.date.slice(5,7)})</td><td><b>${fmt(dd.decouplagePct,1)}%</b></td></tr>
-      <tr><td>Cible</td><td>&lt; ${CIBLES.decouplagePct}% (idéal &lt; 5%)</td></tr></table>
-    <p class="muted" style="margin-top:8px">${dd.notes}</p>`
-    : `<p class="muted">En attente du test standard (tapis 2%, 6'10/km, 60 min). Cible &lt; ${CIBLES.decouplagePct}%.</p>`}
-  </div>
-  <div class="card">
-    <p class="lbl">Exposant de fatigue (Riegel)</p>
-    <p class="muted">En calibration — nécessite plusieurs efforts de durées variées.</p>
-  </div>`;
-}
-
-function renderForce(){
-  return `
-  <h2>Force</h2>
-  <div class="card">
-    <p class="lbl">Références de travail</p>
-    <table class="refs">
-      <tr><td>Banc plat</td><td>24 kg</td></tr>
-      <tr><td>Banc incliné</td><td>20 kg</td></tr>
-      <tr><td>Tractions</td><td>3×5 PdC</td></tr>
-      <tr><td>Rowing haltère</td><td>16 kg · 4×8/bras</td></tr>
-    </table>
-    <p class="muted" style="margin-top:8px">Maintenance — la force de pointe est réglée.</p>
-  </div>
-  <div class="card">
-    <p class="lbl">Sled</p>
-    <p class="muted">Pull = technique avant charge (jambes en synchro). Push entretien.</p>
-  </div>
-  <div class="card">
-    <p class="lbl">Endurance stations — PFT</p>
-    <table class="refs">
-      <tr><td>6 ateliers (run, BBJ, fentes, row, pompes, WB)</td><td>—</td></tr>
-      <tr><td>Cible</td><td>sub-25 min</td></tr></table>
-    <p class="muted" style="margin-top:8px">T1 à faire dans les 10 jours (matériel maison).</p>
-  </div>`;
-}
-
-function renderCharge(){
-  const p = pmc(SESSIONS);
-  const theme = chargeParTheme(SESSIONS);
-  const total = Object.values(theme).reduce((a,b)=>a+b,0);
-  const themeRows = Object.entries(theme).sort((a,b)=>b[1]-a[1]).map(([k,v])=>`
-    <div class="theme"><span class="tn">${MOD[k]||k}</span>
-      <span class="tt"><span style="width:${Math.round(v/total*100)}%"></span></span>
-      <span class="tv">${Math.round(v)}</span></div>`).join("");
-  return `
-  <h2>Charge &amp; forme</h2>
-  <div class="card">
-    <p class="lbl">PMC — fitness / fatigue / forme</p>
-    ${pmcChartSVG(p)}
-    <table class="refs" style="margin-top:8px">
-      <tr><td>Fitness (CTL, 42j)</td><td>${fmt(p.fitness,1)}</td></tr>
-      <tr><td>Fatigue (ATL, 7j)</td><td>${fmt(p.fatigue,1)}</td></tr>
-      <tr><td>Forme (TSB = fitness − fatigue)</td><td>${fmt(p.forme,1)}</td></tr></table>
-    <p class="amorce">⚠ Amorçage — valeurs absolues fiables après ~4 semaines d'accumulation.</p>
-  </div>
-  <div class="card">
-    <p class="lbl">Charge par thème (TRIMP) — ce qu'on a bossé</p>
-    ${themeRows}
-    <p class="muted" style="margin-top:8px">Base du moteur d'orientation : croisé aux jauges,
-      il pointera le thème faible <i>et</i> sous-investi à prioriser.</p>
-  </div>`;
-}
-
-function renderRisque(){
-  const a = acwr(SESSIONS);
-  return `
-  <h2>Risque</h2>
-  <div class="card">
-    <p class="lbl">ACWR — charge aiguë : chronique</p>
-    <p class="muted">${a.fiable ? "Ratio : "+fmt(a.ratio,2)+" (alerte si &gt; 1,5)"
-      : "En calibration — besoin de 28 j d'historique. Base de preuve contestée, à lire avec recul."}</p>
-  </div>
-  <div class="card">
-    <p class="lbl">Mollets excentriques</p>
-    <p class="muted">Cible 3×/sem (sécurité Achille/tibias). Loggé via le tag <code>#mollets</code> —
-      0/3 cette semaine.</p>
-  </div>
-  <div class="card">
-    <p class="lbl">Pics de charge</p>
-    <p class="muted">Volume course : +10%/sem max. Surveillé dès que l'historique le permet.</p>
-  </div>`;
-}
-
-function renderStrat(){
-  const cp = coursePoints();
-  const efNow = cp.length ? cp[cp.length-1].ef : null;
-  const p = pmc(SESSIONS), a = acwr(SESSIONS);
-  const F = s => `<div style="font-family:var(--font-mono);font-size:12px;color:var(--accent);background:var(--hx-ink-800);border:1px solid var(--line);padding:8px 10px;border-radius:8px;margin:6px 0;overflow-x:auto;white-space:pre-wrap;line-height:1.6">${s}</div>`;
-  return `
-  <h2>Stratégie</h2>
-  <div class="verdict">Course <b>Hyrox Pro le 02/10</b>. Le spécifique Hyrox = <b>courir fatigué entre des stations</b> qui chargent fort → l'effort vit surtout en <b>Z3–début Z4</b> (compromis), pas en « 80% facile » classique. Le Z2 reste la base aérobie + la récup. Trois chantiers : <b>durabilité aérobie</b>, <b>endurance de force</b>, <b>tenir l'allure fatigué</b>.</div>
-
-  <div class="card">
-    <p class="lbl">Le principe — distribution d'intensité (spécifique Hyrox)</p>
-    <p class="muted">En endurance pure, le modèle classique est polarisé : ~80% facile, ~20% dur. <b>Hyrox déroge</b> : l'épreuve se court en <b>Z3 à début Z4</b> — allure de compromis sous fatigue, entre le stress métabolique des stations et l'impact mécanique. Le gros du travail <b>spécifique</b> vit donc dans cette bande, pas dans le facile. Le Z2 garde un rôle clé mais minoritaire : entretenir le moteur aérobie et <b>récupérer</b> entre les grosses séances. Le Z5 franc reste rare. Concrètement : tes WOD/HIIT + course fatiguée = le cœur du spécifique (Z3–Z4) ; tes footings EF = la base aérobie en Z2.</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">EF — efficacité aérobie · chantier n°1</p>
-    ${F("EF = (distance_m ÷ durée_min) ÷ FC_moy")}
-    <p class="muted">Mètres parcourus par battement de cœur. À FC égale, un EF qui monte = moteur plus efficace. Cible <b>${CIBLES.ef}</b> · actuel <b>${fmt(efNow,3)}</b>. On veut voir la courbe rejoindre la bande +4 à +7% d'ici 14 semaines.</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">Décrochage aérobie (Pa:HR) — durabilité</p>
-    ${F("décrochage % = (EF_1ère moitié − EF_2ᵉ moitié) ÷ EF_1ère moitié × 100")}
-    <p class="muted">Sur un effort long à allure constante, mesure la dérive du cœur. Si la FC grimpe alors que l'allure ne bouge pas, la base aérobie lâche. Cible <b>&lt; ${CIBLES.decouplagePct}%</b> (idéal &lt; 5%). Déjà mesuré le 25/06 : <b>4,0%</b> (sous la cible). Prochain point : test seuil calibré en conditions neutres.</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">TRIMP — la charge d'une séance</p>
-    ${F("TRIMP = durée_min × HRr × 0,64 × e^(1,92 × HRr)\nHRr = (FC_moy − " + PROFIL.fcRepos + ") ÷ " + RESERVE)}
-    <p class="muted">Le coût d'une séance = durée pondérée par l'intensité. La pondération est <b>exponentielle</b> : une minute à 175 bpm pèse bien plus qu'une minute à 130. C'est la brique de base de toutes les courbes de charge.</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">PMC — fitness / fatigue / forme</p>
-    ${F("CTL (fitness) = moyenne mobile expo 42 j du TRIMP\nATL (fatigue) = moyenne mobile expo 7 j\nTSB (forme) = CTL − ATL")}
-    <p class="muted">La fitness se construit lentement (42 j), la fatigue monte et redescend vite (7 j). Leur écart = la forme. Très négatif = chargé (mauvais jour pour tester) ; proche de 0 ou positif = frais (jour de perf). ${p.fiable ? "Actuel — fitness <b>"+fmt(p.fitness,0)+"</b> · fatigue <b>"+fmt(p.fatigue,0)+"</b> · forme <b>"+fmt(p.forme,0)+"</b>." : "En amorçage tant que l'historique n'est pas assez dense."}</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">ACWR — risque de blessure</p>
-    ${F("ACWR = charge moyenne 7 j ÷ charge moyenne 28 j")}
-    <p class="muted">Compare ce que tu encaisses cette semaine à ton habitude du mois. Zone confortable <b>0,8–1,3</b> ; alerte au-dessus de <b>1,5</b> (montée trop rapide) ; sous 0,8 = sous-charge. ${a.fiable ? "Actuel — <b>"+fmt(a.ratio,2)+"</b>." : "En calibration."} <i>À lire avec recul</i> : indicateur grossier, base de preuve discutée — une alerte parmi d'autres, pas un verdict.</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">Le kite — charge croisée</p>
-    <p class="muted">Le kite compte dans la charge (TRIMP → fitness/fatigue/ACWR) parce qu'il fatigue vraiment le système. Mais il est <b>exclu de l'EF</b> (ce n'est pas de la course) et n'est pas un stimulus Hyrox. À gérer comme une fatigue de fond — surtout avant les grosses séances.</p>
-  </div>
-
-  <div class="card">
-    <p class="lbl">Garde-fous — honnêteté de la donnée</p>
-    <p class="muted">Tant que la donnée est trop creuse, les indicateurs restent en <b>calibration</b> plutôt que d'afficher un faux chiffre. PMC fiable seulement avec ≥ 28 j <i>et</i> ≥ 12 séances ; ACWR avec ≥ 8 séances sur 28 j. Un chiffre faux est pire que pas de chiffre.</p>
-  </div>`;
-}
-
 /* --- mini-graphes SVG (offline, zéro dépendance) --- */
 function efChartSVG(){
   const W=300,H=150,pad=28;
   const wk=[0,2,4,6,8,10,12,14];
   const lo=[1.149,1.156,1.162,1.169,1.176,1.182,1.189,1.195];
   const hi=[1.149,1.160,1.172,1.183,1.195,1.206,1.218,1.229];
-  const pts = coursePoints();                          // footings EF, tracés à leur date
+  const outdoor = coursePoints("outdoor");
+  const tapis = coursePoints("tapis");
+  const all = [...outdoor,...tapis];
   const yMax=1.24;
-  const yMin = pts.length ? Math.min(1.10, Math.min(...pts.map(p=>p.ef))-0.02) : 1.10;
+  const yMin = all.length ? Math.min(1.05, Math.min(...all.map(p=>p.ef))-0.02) : 1.05;
   const X=w=>pad+(Math.max(0,Math.min(14,w))/14)*(W-pad-8);
   const Y=v=>H-22-((Math.max(yMin,Math.min(yMax,v))-yMin)/(yMax-yMin))*(H-22-8);
-  const band=[...wk.map((w,i)=>`${X(w)},${Y(hi[i])}`),
-    ...wk.map((w,i)=>`${X(w)},${Y(lo[i])}`).reverse()].join(" ");
-  const dots = pts.map(p=>`<circle cx="${X(p.week)}" cy="${Y(p.ef)}" r="4" fill="var(--real)"/>`).join("");
-  const path = pts.length>1
-    ? `<polyline points="${pts.map(p=>`${X(p.week)},${Y(p.ef)}`).join(" ")}" fill="none" stroke="var(--real)" stroke-width="2"/>` : "";
+  const band=[...wk.map((w,i)=>`${X(w)},${Y(hi[i])}`),...wk.map((w,i)=>`${X(w)},${Y(lo[i])}`).reverse()].join(" ");
+  const serie = (pts,col) => {
+    const dots = pts.map(p=>`<circle cx="${X(p.week)}" cy="${Y(p.ef)}" r="4" fill="${col}"/>`).join("");
+    const path = pts.length>1 ? `<polyline points="${pts.map(p=>`${X(p.week)},${Y(p.ef)}`).join(" ")}" fill="none" stroke="${col}" stroke-width="2"/>` : "";
+    return path+dots;
+  };
+  // Couleurs EN DUR : les var(--x) ne se résolvent pas dans les attributs SVG de certains moteurs
+  // → retombée en noir (invisible sur fond sombre). Outdoor = vert, tapis = orange.
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="150">
-    <polygon points="${band}" fill="var(--target)" opacity="0.28"/>
-    <line x1="${pad}" y1="${H-22}" x2="${W-8}" y2="${H-22}" stroke="var(--line)"/>
-    ${path}${dots}
-    <text x="${pad}" y="${H-6}" font-size="10" fill="var(--hint)">0</text>
-    <text x="${W-14}" y="${H-6}" font-size="10" fill="var(--hint)">14 sem</text>
-    <text x="2" y="${Y(1.24)+4}" font-size="10" fill="var(--hint)">1.24</text>
-    <text x="2" y="${Y(yMin)}" font-size="10" fill="var(--hint)">${yMin.toFixed(2)}</text>
+    <polygon points="${band}" fill="#2BD9D2" opacity="0.20"/>
+    <line x1="${pad}" y1="${H-22}" x2="${W-8}" y2="${H-22}" stroke="#4A4F57"/>
+    ${serie(tapis,"#FF7A1A")}
+    ${serie(outdoor,"#2FD27A")}
+    <text x="${pad}" y="${H-6}" font-size="10" fill="#C7CCD2">0</text>
+    <text x="${W-14}" y="${H-6}" font-size="10" fill="#C7CCD2">14 sem</text>
+    <text x="2" y="${Y(1.24)+4}" font-size="10" fill="#C7CCD2">1.24</text>
+    <text x="2" y="${Y(yMin)}" font-size="10" fill="#C7CCD2">${yMin.toFixed(2)}</text>
   </svg>`;
 }
 function pmcChartSVG(p){
@@ -575,22 +666,21 @@ function pmcChartSVG(p){
   const Y=v=>H-18-((v-min)/((max-min)||1))*(H-18-8);
   const line=arr=>arr.map((v,i)=>`${X(i)},${Y(v)}`).join(" ");
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="120">
-    <polyline points="${line(ctl)}" fill="none" stroke="var(--accent)" stroke-width="2"/>
-    <polyline points="${line(atl)}" fill="none" stroke="var(--real)" stroke-width="2" stroke-dasharray="4 3"/>
-    <text x="${pad}" y="${H-4}" font-size="10" fill="var(--hint)">${p.series[0].day.slice(5)}</text>
-    <text x="${W-30}" y="${H-4}" font-size="10" fill="var(--hint)">${p.series[n-1].day.slice(5)}</text>
+    <polyline points="${line(ctl)}" fill="none" stroke="#F2EA00" stroke-width="2"/>
+    <polyline points="${line(atl)}" fill="none" stroke="#FF7A1A" stroke-width="2" stroke-dasharray="4 3"/>
+    <text x="${pad}" y="${H-4}" font-size="10" fill="#C7CCD2">${p.series[0].day.slice(5)}</text>
+    <text x="${W-30}" y="${H-4}" font-size="10" fill="#C7CCD2">${p.series[n-1].day.slice(5)}</text>
   </svg>
   <div class="zleg" style="margin-top:4px">
-    <span><i style="background:var(--accent)"></i>fitness (CTL)</span>
-    <span><i style="background:var(--real)"></i>fatigue (ATL)</span></div>`;
+    <span><i style="background:#F2EA00"></i>fitness (CTL)</span>
+    <span><i style="background:#FF7A1A"></i>fatigue (ATL)</span></div>`;
 }
 
 /* --- navigation swipe + onglets --- */
 const tabsEl = document.getElementById("tabs");
 const swiper = document.getElementById("swiper");
-/* compte à rebours dynamique : recalculé à chaque ouverture depuis la date réelle */
 const jRace = Math.max(0, Math.ceil((RACE - new Date())/864e5));
-document.getElementById("brand").innerHTML = `<b>Hyrox Pro — Max</b> · J−${jRace} · phase 2`;
+document.getElementById("brand").innerHTML = `<b>Hyrox Pro — Max</b> · J−${jRace} · phase ${phaseActuelle().n}`;
 PAGES.forEach((pg,i)=>{
   document.getElementById(pg.id).innerHTML = pg.render();
   const b=document.createElement("button");
