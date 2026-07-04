@@ -112,6 +112,7 @@ svg{display:block}
   </header>
   <main class="swiper" id="swiper">
     <section class="page" id="p-jour"></section>
+    <section class="page" id="p-semaine"></section>
     <section class="page" id="p-course"></section>
     <section class="page" id="p-dura"></section>
     <section class="page" id="p-charge"></section>
@@ -228,6 +229,21 @@ const TESTS = [
    le compteur "X/3 sem." est CALCULÉ sur la semaine en cours (voir molletsSemaine). */
 const MOLLETS = ["2026-06-30","2026-07-03","2026-07-04"];
 
+/* Template de "semaine idéale" par phase — cibles hebdo par STIMULUS (pas par nom de séance) +
+   plafond de jours durs. Dérivé du Plan v3 §7. Brut/éditable : le rendu Semaine compare la
+   semaine réelle à ça (couverture, trous, excès). Catégories : facile / seuil / compromise /
+   force (sled+core+renfo) / recup (yoga-mobilité). Le kite (croisé) n'entre pas dans les cibles. */
+const TEMPLATE_PHASE = {
+  1:{ facile:1, seuil:0, compromise:0, force:2, recup:0, dursMax:2, note:"Fondation : muscle haut du corps + base course." },
+  2:{ facile:2, seuil:1, compromise:0, force:1, recup:0, dursMax:2, note:"Voyage Club Med : base Z2 + amorce seuil + core/haltères. Pas de station dure prévue." },
+  3:{ facile:2, seuil:1, compromise:1, force:1, recup:1, dursMax:3, note:"Relance : 1ᵉʳ seuil + sled technique + intro compromise + core." },
+  4:{ facile:2, seuil:0, compromise:0, force:0, recup:1, dursMax:1, note:"Calvi/mariage : décharge = surcompensation." },
+  5:{ facile:2, seuil:1, compromise:0, force:2, recup:0, dursMax:3, note:"Sled PUISSANCE + pliométrie + seuil installé + core lourd." },
+  6:{ facile:3, seuil:1, compromise:1, force:1, recup:0, dursMax:3, note:"Maurice : volume Z2 + seuil + sortie longue + compromise poids du corps." },
+  7:{ facile:1, seuil:1, compromise:2, force:1, recup:0, dursMax:3, note:"Pic : simulations + sled fatigué + seuil jambes cuites." },
+  8:{ facile:1, seuil:1, compromise:1, force:1, recup:1, dursMax:2, note:"Taper 14 j : coupe le volume, garde intensité + charges lourdes." }
+};
+
 const REFERENCE_OPEN = {
   date:"2025-11", format:"Open Men Solo",
   fcMoy:181, trimp:277, pctZ4plus:96, deriveBpm:11,
@@ -237,21 +253,21 @@ const REFERENCE_OPEN = {
 /* Les 8 phases du Plan v2 (dates 2026). NOUVEAU en V3 : sert la timeline + la décision du jour. */
 const PHASES = [
   { n:1, nom:"Fondation + hypertrophie", debut:"2026-06-17", lieu:"Maison",
-    focus:"Muscle haut du corps + base course + technique pull." },
+    focus:"Muscle haut du corps + base course + technique pull. (fait)" },
   { n:2, nom:"Maintien voyage — Club Med", debut:"2026-06-29", lieu:"Club Med",
-    focus:"3 courses faciles Z2 + 1 amorce seuil (4×800 m) + 2 full-body haltères & tractions." },
+    focus:"Course facile Z2 (socle) + 1 amorce seuil (4×800 m) + core profond 2×/sem + poussée/tirage haltères. Pas de sled (voyage) → on prépare le terrain." },
   { n:3, nom:"Relance", debut:"2026-07-05", lieu:"Maison",
-    focus:"1ᵉʳ vrai seuil (4×1 km) + retour sled + intro course compromise douce." },
+    focus:"1ᵉʳ vrai seuil (4×1 km) + retour sled technique (push/pull) + intro course compromise douce (500 m→station→500 m) + core intégré. 1 sortie longue seuil-en-fin." },
   { n:4, nom:"Maintien voyage — Calvi", debut:"2026-07-14", lieu:"Calvi",
-    focus:"2 courses faciles + nage. Décharge = surcompensation." },
+    focus:"2 courses faciles + nage (mariage le 16). Décharge = surcompensation ; core léger si envie." },
   { n:5, nom:"Force / puissance + seuil", debut:"2026-07-18", lieu:"Maison",
-    focus:"Dernier bloc lourd + pliométrie + seuil installé (5-6×1 km)." },
+    focus:"Sled PUISSANCE 2× (lourd/court, explosif) + pliométrie 2×/sem + seuil installé (5-6×1 km) + core lourd. Dernière fenêtre muscle." },
   { n:6, nom:"Base aérobie + seuil — Maurice", debut:"2026-07-30", lieu:"Maurice",
-    focus:"Volume course Z2 4-5×/sem + 1 seuil/sem + 1 sortie longue + kite. Chaleur : tôt/tard, électrolytes." },
+    focus:"Volume Z2 4-5×/sem + 1 seuil/sem + 1 sortie longue (seuil en fin) + 1 compromise poids du corps. Sans sled → poussée/tirage haltères + core. Kite = cross-training. Chaleur : FC/RPE, électrolytes." },
   { n:7, nom:"Spécifique / pic", debut:"2026-09-03", lieu:"Maison",
-    focus:"2 simulations/sem + endurance de force + seuil jambes fatiguées." },
+    focus:"2 simulations/sem (stations Pro dans l'ordre) + sled sous fatigue + endurance de force + seuil jambes fatiguées + core entretien." },
   { n:8, nom:"Affûtage + pic", debut:"2026-09-22", lieu:"Maison",
-    focus:"Taper 14 j : volume course -50/-60%, force -30/-50% (charges lourdes gardées), carb-up." }
+    focus:"Taper 14 j affiné : course −50/−60 %, force/sled −30/−50 % (charges lourdes gardées), fréquence maintenue + carb-up ~J−2." }
 ];
 
 const MOD = { m1:"M1 facile", m2:"M2 seuil", m3:"M3 compromise",
@@ -337,19 +353,58 @@ function compromiseSessions(){ return SESSIONS.filter(s=>s.type==="m3"||(s.tags&
 function dernierDecouplage(){
   return SESSIONS.filter(s=>s.decouplagePct!=null).sort((a,b)=>a.date<b.date?1:-1)[0] || null;
 }
-/* Compte les séances de mollets dans la semaine (lun→dim) contenant AUJ. Comparaison
-   en chaînes ISO "YYYY-MM-DD" → aucun souci de fuseau horaire. */
-function molletsSemaine(ref=AUJ){
+/* Bornes de la semaine (lun→dim) contenant ref, en chaînes ISO "YYYY-MM-DD" (hi = lundi
+   suivant, exclu) → comparaisons de dates sans souci de fuseau. Base commune mollets + bilan. */
+function bornesSemaine(ref=AUJ){
   const d=new Date(ref); d.setHours(12,0,0,0);
   const lundi=new Date(d); lundi.setDate(d.getDate()-((d.getDay()+6)%7));
   const iso=x=>x.toISOString().slice(0,10);
-  const lo=iso(lundi), hi=iso(new Date(lundi.getTime()+7*864e5));   // lundi suivant, exclu
+  return { lo:iso(lundi), hi:iso(new Date(lundi.getTime()+7*864e5)) };
+}
+function molletsSemaine(ref=AUJ){
+  const {lo,hi}=bornesSemaine(ref);
   return MOLLETS.filter(x=>x>=lo && x<hi).length;
 }
-function phaseActuelle(){
+function phaseActuelle(ref=AUJ){
   let cur=PHASES[0];
-  for(const p of PHASES){ if(J(p.debut) <= AUJ) cur=p; }
+  for(const p of PHASES){ if(J(p.debut) <= ref) cur=p; }
   return cur;
+}
+
+/* --- Cockpit "Semaine" : classer le réel, le comparer au template de phase --- */
+/* Une séance est DURE si RPE≥8 OU ≥12 min en Z4+Z5 (même règle que seancesDures). */
+function estDure(s){ const z=s.zonesMin||{}; return (s.rpe!=null&&s.rpe>=8) || ((z.z4||0)+(z.z5||0))>=12; }
+const CAT_LABEL = { facile:"Facile (Z2)", seuil:"Seuil (Z4)", compromise:"Compromise / stations",
+  force:"Force / sled / core", croise:"Croisé (kite)", recup:"Récup / mobilité" };
+/* Classe par STIMULUS RÉEL : les tags/type explicites priment, sinon on lit la zone reine des
+   données. → une séance collective "HIIT/fractionné" est rangée par ce qu'elle a produit. */
+function classifieSeance(s){
+  const t=s.tags||[];
+  if(s.type==="kite"||t.includes("kite")) return "croise";
+  if(t.includes("yoga")||t.includes("mobilite")||t.includes("recup")) return "recup";
+  if(s.type==="m3"||t.includes("compromise")) return "compromise";
+  if(s.type==="m2"||t.includes("seuil")) return "seuil";
+  if(s.type==="m6"||t.includes("hiit")||t.includes("emom")||t.includes("wod")||t.includes("stations")) return "compromise";
+  if(s.type==="m4"||s.type==="m5"||t.includes("force")||t.includes("sled")||t.includes("renfo")||t.includes("core")) return "force";
+  const z=s.zonesMin||{}, z45=(z.z4||0)+(z.z5||0), z3=(z.z3||0), zEasy=(z.z1||0)+(z.z2||0);
+  if(z45>=Math.max(8,z3,zEasy)) return "seuil";
+  if(z3>=Math.max(8,zEasy)) return "compromise";
+  return "facile";
+}
+function seancesSemaine(ref=AUJ){
+  const {lo,hi}=bornesSemaine(ref);
+  return SESSIONS.filter(s=>s.date>=lo && s.date<hi).sort((a,b)=>a.date<b.date?-1:1);
+}
+function bilanSemaine(ref=AUJ){
+  const ses=seancesSemaine(ref).map(s=>({ s, cat:classifieSeance(s) }));
+  const compte={ facile:0, seuil:0, compromise:0, force:0, croise:0, recup:0 };
+  const joursDurs=new Set();
+  for(const x of ses){ compte[x.cat]++; if(estDure(x.s)) joursDurs.add(x.s.date); }
+  const ph=phaseActuelle(ref), tpl=TEMPLATE_PHASE[ph.n]||{};
+  const ordre=["compromise","seuil","force","facile"];   // priorité des trous : le spécifique d'abord
+  const trous=ordre.filter(c=>(tpl[c]||0)>compte[c]).map(c=>({ cat:c, manque:(tpl[c]||0)-compte[c] }));
+  const dursN=joursDurs.size, dursMax=tpl.dursMax??3;
+  return { ph, tpl, ses, compte, trous, dursN, dursMax, exces:dursN>dursMax };
 }
 /* NOUVEAU V3 — la brique du compagnon : "quoi faire aujourd'hui + suis-je frais ?".
    Heuristique honnête et simple : compte les grosses piqûres qualité récentes. */
@@ -396,6 +451,7 @@ function prochainEntrainement(){
    ============================================================ */
 const PAGES = [
   {id:"p-jour",   tab:"Aujourd'hui", render:renderJour},
+  {id:"p-semaine",tab:"Semaine",     render:renderSemaine},
   {id:"p-course", tab:"Course",      render:renderCourse},
   {id:"p-dura",   tab:"Durabilité",  render:renderDura},
   {id:"p-charge", tab:"Charge",      render:renderCharge},
@@ -644,6 +700,79 @@ function renderPlan(){
       <tr><td>Dérive cardiaque (8 runs)</td><td>+${REFERENCE_OPEN.deriveBpm} bpm</td></tr>
     </table>
     <p class="muted" style="margin-top:8px">${REFERENCE_OPEN.notes}</p>
+  </div>`;
+}
+
+/* ---------- PAGE : SEMAINE (cockpit de contrôle) ---------- */
+function renderSemaine(){
+  const b=bilanSemaine();
+  const {lo,hi}=bornesSemaine();
+  const dim=new Date(new Date(hi).getTime()-864e5).toISOString().slice(0,10);   // dimanche
+  const lbl=x=>x.slice(8)+"/"+x.slice(5,7);
+
+  // 1 · séances de la semaine, classées par stimulus réel
+  const rows = b.ses.length ? b.ses.map(x=>{
+    const dur=estDure(x.s);
+    return `<div class="row"><span class="dot ${dur?"bad":"ok"}"></span>
+      <span class="nm">${lbl(x.s.date)} · ${MOD[x.s.type]||x.s.type}${dur?" <small>· jour dur</small>":""}</span>
+      <span class="pill">${CAT_LABEL[x.cat]}</span></div>`;
+  }).join("") : `<p class="muted">Aucune séance loggée cette semaine.</p>`;
+
+  // 2 · couverture vs template de phase
+  const covOrder=["facile","seuil","compromise","force","recup"];
+  const cov = covOrder.filter(c=>(b.tpl[c]||0)>0 || b.compte[c]>0).map(c=>{
+    const cible=b.tpl[c]||0, fait=b.compte[c], ok=fait>=cible;
+    return `<div class="row"><span class="dot ${ok?"ok":"warn"}"></span>
+      <span class="nm">${CAT_LABEL[c]}</span>
+      <span class="pill ${ok?"ok":"warn"}">${fait}/${cible}</span></div>`;
+  }).join("");
+  const trouTxt = b.trous.length
+    ? b.trous.map(t=>CAT_LABEL[t.cat]+(t.manque>1?" ×"+t.manque:"")).join(" · ")
+    : "aucun — semaine couverte";
+
+  // 3 · signaux direction (réutilise les capteurs existants)
+  const out=coursePoints("outdoor");
+  const efTrend = out.length>=2 ? out[out.length-1].ef-out[out.length-2].ef : null;
+  const efDot = efTrend==null?"warn":(efTrend>0.002?"ok":efTrend<-0.005?"bad":"warn");
+  const efTxt = efTrend==null?"1 pt" : (efTrend>0?"+":"")+efTrend.toFixed(3);
+  const dd=dernierDecouplage();
+  const ddDot = !dd?"warn":(dd.decouplagePct<5?"ok":dd.decouplagePct<=8?"warn":"bad");
+  const a=acwr(SESSIONS), acDot = !a.fiable?"warn":(a.ratio>=0.8&&a.ratio<=1.3?"ok":a.ratio>1.5?"bad":"warn");
+  const p=pmc(SESSIONS);
+
+  return `
+  <div class="verdict">Semaine <b>${lbl(lo)} → ${lbl(dim)}</b> · phase ${b.ph.n} — ${b.ph.lieu}. ${b.tpl.note||""}</div>
+
+  <div class="card">
+    <p class="lbl">1 · Séances de la semaine <small style="color:var(--hint)">(classées par stimulus réel)</small></p>
+    ${rows}
+    <p class="muted" style="margin-top:8px">Le collectif (HIIT / renfo / fractionné) est rangé par ce qu'il a <b>réellement produit</b> (zone reine + tags), pas par son nom. Point rouge = jour dur (RPE≥8 ou ≥12 min en Z4+).</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">2 · Couverture vs idéal — phase ${b.ph.n}</p>
+    ${cov}
+    <div class="row"><span class="dot ${b.exces?"bad":"ok"}"></span>
+      <span class="nm">Jours durs <small>· à espacer</small></span>
+      <span class="pill ${b.exces?"bad":"ok"}">${b.dursN}/${b.dursMax}</span></div>
+    <p class="muted" style="margin-top:8px">Manque : <b>${trouTxt}</b>. ${b.exces?"⚠ Trop de jours durs — n'ajoute rien d'intense, espace-les et garde les faciles vraiment faciles.":"Charge dure sous le plafond de la phase."}</p>
+  </div>
+
+  <div class="card">
+    <p class="lbl">3 · Direction — va-t-on dans le bon sens ?</p>
+    <div class="row"><span class="dot ${efDot}"></span>
+      <span class="nm">Économie (EF) <small>· doit monter à FC=</small></span>
+      <span class="pill ${efDot}">${efTxt}</span></div>
+    <div class="row"><span class="dot ${ddDot}"></span>
+      <span class="nm">Durabilité <small>· découplage</small></span>
+      <span class="pill ${ddDot}">${dd?fmt(dd.decouplagePct,1)+"%":"—"}</span></div>
+    <div class="row"><span class="dot ${acDot}"></span>
+      <span class="nm">Risque <small>· ACWR</small></span>
+      <span class="pill ${acDot}">${a.fiable?fmt(a.ratio,2):"calib."}</span></div>
+    <div class="row"><span class="dot ${p.fiable?(p.forme>=-15?"ok":"warn"):"warn"}"></span>
+      <span class="nm">Fraîcheur <small>· TSB</small></span>
+      <span class="pill">${p.fiable?fmt(p.forme,0):"amorçage"}</span></div>
+    <p class="muted" style="margin-top:8px">Correction : EF stagne/baisse → + de facile, − d'intensité parasite · découplage > 5% → volume facile · ACWR > 1,5 → coupe le volume la semaine suivante · manque compromise → priorité (LE différenciateur).</p>
   </div>`;
 }
 
