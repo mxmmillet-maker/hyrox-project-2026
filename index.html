@@ -212,13 +212,21 @@ const SESSIONS = [
   { date:"2026-07-03", type:"m6", tags:["m6","hiit","emom","fatigue"],
     dureeMin:33, distanceKm:null, fcMoy:173.7, fcMax:187, rpe:9,
     zonesMin:{z1:0,z2:0,z3:2.6,z4:28.7,z5:1.3}, decouplagePct:null,
-    notes:"EMOM hybride format Hyrox — 1 min ON / 20 s OFF, 2 blocs de 4 items ×3 tours (rameur/vélo ergo/SkiErg/squat haltère 20 ; smashball burpees 10/box step/hang clean/sled push), 1 min OFF inter-blocs. Rameur+SkiErg+sled push = 3 stations Hyrox directes, hang clean dos droit = transfert hip hinge. Zone reine Z4 87 % (28,7 min), 0 % sous 167 : les OFF de 20 s ne font pas redescendre la FC (plancher ~163-164) → stimulus de répétabilité sous fatigue, pile le chantier n°1. TRIMP 91, ~522 kcal. ⚠️ Conditions dégradées : clim en panne, salle bondée, 34°C ext → FC et RPE biaisés à la hausse (coût thermique). RPE annoncé 9 gonflé par la chaleur, sur charge sèche ~8-8,5 (cf. 19/06). 2ᵉ grosse piqûre qualité de la semaine (seuil 01/07 TRIMP 80 + celle-ci) → prochaine séance = Z2 facile plafond 152 ou repos. Données montre." }
+    notes:"EMOM hybride format Hyrox — 1 min ON / 20 s OFF, 2 blocs de 4 items ×3 tours (rameur/vélo ergo/SkiErg/squat haltère 20 ; smashball burpees 10/box step/hang clean/sled push), 1 min OFF inter-blocs. Rameur+SkiErg+sled push = 3 stations Hyrox directes, hang clean dos droit = transfert hip hinge. Zone reine Z4 87 % (28,7 min), 0 % sous 167 : les OFF de 20 s ne font pas redescendre la FC (plancher ~163-164) → stimulus de répétabilité sous fatigue, pile le chantier n°1. TRIMP 91, ~522 kcal. ⚠️ Conditions dégradées : clim en panne, salle bondée, 34°C ext → FC et RPE biaisés à la hausse (coût thermique). RPE annoncé 9 gonflé par la chaleur, sur charge sèche ~8-8,5 (cf. 19/06). 2ᵉ grosse piqûre qualité de la semaine (seuil 01/07 TRIMP 80 + celle-ci) → prochaine séance = Z2 facile plafond 152 ou repos. Données montre." },
+  { date:"2026-07-04", type:"m1", tags:["m1","tapis","facile"],
+    dureeMin:29.5, distanceKm:4.22, fcMoy:140.6, fcMax:149, rpe:4,
+    zonesMin:{z1:5.9,z2:23.6,z3:0,z4:0,z5:0}, decouplagePct:null,
+    notes:"EF facile tapis (1,5 % incl., Club Med) — pôle facile du polarisé, 2ᵉ séance facile de la semaine → rééquilibre le ratio (2 facile / 2 dur). Console 5'15→5'30/km, allure auto-régulée sur la FC donc NON exploitable comme repère (tapis sur-estime ~30 %, montre indoor sous-estime) : FC = seul signal fiable → pas de point EF (pas de segment steady à allure tenue). FC moy 140,6 (62 % réserve) / max 149 (152 jamais touché), Z2 80 % (23,6 min) + Z1 17 %, 0 % au-dessus de 152. TRIMP ~39, ~351 kcal. Dérive quasi nulle une fois chaud (plateau 143-145 jusqu'au bout) — contraste net avec le seuil du 01/07 : sur l'allure facile le cœur se stabilise, la base aérobie fait son boulot. Récup passive ~23 bpm sur la 1re min. RPE 4 cohérent avec la donnée (bas-milieu Z2), perception facile bien calibrée. Mollets excentriques (3ᵉ de la semaine, cible 3×/sem atteinte) + étirements. Données montre." }
 ];
 
 const TESTS = [
   { date:"2026-06-18", type:"seuil", allure:"4'55–5'05", fcLo:178, fcHi:182,
     notes:"Test tapis — seuil ~4'55-5'05/km @ 178-182. Bande Z4 167-181 validée." }
 ];
+
+/* Mollets excentriques — renfo Achille, cible 3×/sem. On stocke juste les DATES (brut) ;
+   le compteur "X/3 sem." est CALCULÉ sur la semaine en cours (voir molletsSemaine). */
+const MOLLETS = ["2026-06-30","2026-07-03","2026-07-04"];
 
 const REFERENCE_OPEN = {
   date:"2025-11", format:"Open Men Solo",
@@ -329,6 +337,15 @@ function compromiseSessions(){ return SESSIONS.filter(s=>s.type==="m3"||(s.tags&
 function dernierDecouplage(){
   return SESSIONS.filter(s=>s.decouplagePct!=null).sort((a,b)=>a.date<b.date?1:-1)[0] || null;
 }
+/* Compte les séances de mollets dans la semaine (lun→dim) contenant AUJ. Comparaison
+   en chaînes ISO "YYYY-MM-DD" → aucun souci de fuseau horaire. */
+function molletsSemaine(ref=AUJ){
+  const d=new Date(ref); d.setHours(12,0,0,0);
+  const lundi=new Date(d); lundi.setDate(d.getDate()-((d.getDay()+6)%7));
+  const iso=x=>x.toISOString().slice(0,10);
+  const lo=iso(lundi), hi=iso(new Date(lundi.getTime()+7*864e5));   // lundi suivant, exclu
+  return MOLLETS.filter(x=>x>=lo && x<hi).length;
+}
 function phaseActuelle(){
   let cur=PHASES[0];
   for(const p of PHASES){ if(J(p.debut) <= AUJ) cur=p; }
@@ -414,6 +431,10 @@ function renderJour(){
   const acwrCls = acwrVal==null?"":(acwrVal>1.5?"bad":acwrVal>=0.8&&acwrVal<=1.3?"ok":"warn");
   const acwrTxt = acwrVal==null?"calibration":fmt(acwrVal,2);
 
+  // mollets excentriques — compteur hebdo calculé (cible 3/sem)
+  const molCnt = molletsSemaine();
+  const molOk = molCnt>=3;
+
   return `
   <div class="today ${dj.mode}">
     <p class="kick">Prochain entraînement · Phase ${ph.n} — ${ph.lieu}</p>
@@ -438,9 +459,9 @@ function renderJour(){
     <div class="row"><span class="dot ${acwrCls}"></span>
       <span class="nm">Risque blessure <small>· ACWR</small></span>
       <span class="pill ${acwrCls}">${acwrTxt}</span></div>
-    <div class="row"><span class="dot warn"></span>
+    <div class="row"><span class="dot ${molOk?"ok":"warn"}"></span>
       <span class="nm">Mollets excentriques <small>· sécurité Achille</small></span>
-      <span class="pill warn">0/3 sem.</span></div>
+      <span class="pill ${molOk?"ok":"warn"}">${molCnt}/3 sem.</span></div>
   </div>
 
   <div class="verdict">Cap : <b>Hyrox Pro le 02/10</b> · J−${Math.max(0,Math.ceil(joursEntre(AUJ,RACE)))}. Le spécifique = <b>courir fatigué entre des stations</b> (effort Z3–début Z4), pas « 80% facile ». Trois chantiers : <b>durabilité aérobie</b>, <b>endurance de force</b>, <b>tenir l'allure fatigué</b>.</div>`;
