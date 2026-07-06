@@ -217,7 +217,11 @@ const SESSIONS = [
   { date:"2026-07-04", type:"m1", tags:["m1","tapis","facile"],
     dureeMin:29.5, distanceKm:4.22, fcMoy:140.6, fcMax:149, rpe:4,
     zonesMin:{z1:5.9,z2:23.6,z3:0,z4:0,z5:0}, decouplagePct:null,
-    notes:"EF facile tapis (1,5 % incl., Club Med) — pôle facile du polarisé, 2ᵉ séance facile de la semaine → rééquilibre le ratio (2 facile / 2 dur). Console 5'15→5'30/km, allure auto-régulée sur la FC donc NON exploitable comme repère (tapis sur-estime ~30 %, montre indoor sous-estime) : FC = seul signal fiable → pas de point EF (pas de segment steady à allure tenue). FC moy 140,6 (62 % réserve) / max 149 (152 jamais touché), Z2 80 % (23,6 min) + Z1 17 %, 0 % au-dessus de 152. TRIMP ~39, ~351 kcal. Dérive quasi nulle une fois chaud (plateau 143-145 jusqu'au bout) — contraste net avec le seuil du 01/07 : sur l'allure facile le cœur se stabilise, la base aérobie fait son boulot. Récup passive ~23 bpm sur la 1re min. RPE 4 cohérent avec la donnée (bas-milieu Z2), perception facile bien calibrée. Mollets excentriques (3ᵉ de la semaine, cible 3×/sem atteinte) + étirements. Données montre." }
+    notes:"EF facile tapis (1,5 % incl., Club Med) — pôle facile du polarisé, 2ᵉ séance facile de la semaine → rééquilibre le ratio (2 facile / 2 dur). Console 5'15→5'30/km, allure auto-régulée sur la FC donc NON exploitable comme repère (tapis sur-estime ~30 %, montre indoor sous-estime) : FC = seul signal fiable → pas de point EF (pas de segment steady à allure tenue). FC moy 140,6 (62 % réserve) / max 149 (152 jamais touché), Z2 80 % (23,6 min) + Z1 17 %, 0 % au-dessus de 152. TRIMP ~39, ~351 kcal. Dérive quasi nulle une fois chaud (plateau 143-145 jusqu'au bout) — contraste net avec le seuil du 01/07 : sur l'allure facile le cœur se stabilise, la base aérobie fait son boulot. Récup passive ~23 bpm sur la 1re min. RPE 4 cohérent avec la donnée (bas-milieu Z2), perception facile bien calibrée. Mollets excentriques (3ᵉ de la semaine, cible 3×/sem atteinte) + étirements. Données montre." },
+  { date:"2026-07-05", type:"m5", tags:["m5","force","sled"],
+    dureeMin:35.5, distanceKm:null, fcMoy:142, fcMax:173, rpe:7,
+    zonesMin:{z1:13.0,z2:12.5,z3:6.5,z4:2.2,z5:0}, decouplagePct:null,
+    notes:"Sled + force (M5) — 1er bloc traîneau maison (Phase 3 relance, calibration des charges). Pull technique 8×10 m @ 102 kg (RPE 7, geste propre, jambes qui entraînent) · Push 3×50 m @ 142 kg chaque 50 m d'une traite, pushes COURTS et RAPIDES, récup ~2:10 (FC 170→126, RPE 9 venant de la VITESSE pas du grind) · Deadlift classique 3×8 @ 75 kg (marge dispo → +5) · Farmers 3×50 m @ 2×32 kg (poids course) · Mollets excentriques 3×12/côté. Sol maison roulant → 142 kg ici ≈ bien plus léger que 202 kg sur carpet Hyrox. ⚠️ Montre lancée tard (fin du pull) + arrêtée avant les farmers → début/fin non captés, coût réel sous-estimé (TRIMP ~48 sur le capté). Profil séance de force : zone reine Z1-Z2, pic Z4 6 % au push, 0 grind aérobie soutenu. Récup ~47 bpm/1 min = bonne. LECTURE : la demande course n'est pas un 50 m vif mais un GRIND continu ~4:50 au poids Pro (202 kg) jambes cuites → 142 kg n'est pas trop lourd, il est trop léger/rapide pour reproduire la course. Vrai chantier à installer : 1 SEUL 50 m continu LENT sur charge >142 kg, chronométré, cible ~3:30-4:00 en construisant vers 4:50 ; faible volume, récup complète, hip hinge propre / dos neutre / sangle serrée (bas du dos exposé). Deadlift 75→80 kg. Logistique : lancer la montre AVANT le rameur, l'arrêter APRÈS les mollets, et chronométrer un 50 m de push (seul chiffre fiable pour caler la charge — la FC ne donne pas la durée de poussée). Données montre (portion captée)." }
 ];
 
 const TESTS = [
@@ -227,7 +231,7 @@ const TESTS = [
 
 /* Mollets excentriques — renfo Achille, cible 3×/sem. On stocke juste les DATES (brut) ;
    le compteur "X/3 sem." est CALCULÉ sur la semaine en cours (voir molletsSemaine). */
-const MOLLETS = ["2026-06-30","2026-07-03","2026-07-04"];
+const MOLLETS = ["2026-06-30","2026-07-03","2026-07-04","2026-07-05"];
 
 /* Template de "semaine idéale" par phase — cibles hebdo par STIMULUS (pas par nom de séance) +
    plafond de jours durs. Dérivé du Plan v3 §7. Brut/éditable : le rendu Semaine compare la
