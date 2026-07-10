@@ -429,42 +429,54 @@ function bilanSemaine(ref=AUJ){
 }
 /* NOUVEAU V3 — la brique du compagnon : "quoi faire aujourd'hui + suis-je frais ?".
    Heuristique honnête et simple : compte les grosses piqûres qualité récentes. */
-function seancesDures(sessions, jours){
+function seancesDures(sessions, jours, ref=AUJ){
   return sessions.filter(s=>{
-    const d = joursEntre(s.date, AUJ);
+    const d = joursEntre(s.date, ref);
     if(d<0 || d>jours) return false;
     const z45 = (s.zonesMin?(s.zonesMin.z4||0)+(s.zonesMin.z5||0):0);
     return (s.rpe!=null && s.rpe>=8) || z45>=12;   // dur = RPE≥8 OU ≥12 min en Z4+Z5
   });
 }
-/* Séance qualité type de chaque phase (le "programme" quand tu es frais). */
-const SEANCE_PHASE = {
-  1:"Haut du corps (M4) — développés haltères + tractions + gainage anti-extension.",
-  2:"Course facile Z2 30-40 min, OU amorce seuil 4×800 m. + ceinture profonde 10 min.",
-  3:"Seuil M2 — 4×1 km à l'allure seuil, récup 90 s. + technique sled pull.",
-  4:"Course facile 30 min + nage (décharge).",
-  5:"Sled puissance — pushes lourds courts explosifs + hinge KB + pliométrie.",
-  6:"Sortie longue 60-75 min avec 2×12 min au seuil en fin de séance.",
-  7:"Simulation partielle — course + 3-4 stations au poids Pro, dans l'ordre.",
-  8:"Séance courte allure course + activation (affûtage)."
+/* Programme concret par STIMULUS manquant (aligné cockpit Semaine / Plan v3). */
+const PROG_CAT = {
+  compromise:"Course compromise — 500 m allure course → 1 station poids course → 500 m, SANS pause.",
+  seuil:"Seuil M2 — 4×1 km à l'allure seuil (4'55/km), récup 90 s.",
+  force:"Force / sled — pushes lourds courts + hinge KB + mollets excentriques.",
+  facile:"Footing Z2 facile 30-40 min (plafond 152 bpm).",
+  recup:"Mobilité / yoga — décharge active."
 };
-/* Prochain entraînement : date + programme concret. La fraîcheur (charge récente réelle)
-   module le programme : récup imposée si 2 grosses piqûres en 3 j. */
-function prochainEntrainement(){
-  const dures3 = seancesDures(SESSIONS,3);
-  const dures1 = seancesDures(SESSIONS,1);
-  const ph = phaseActuelle();
-  const dateLabel = AUJ.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
-  if(dures1.length>=1 || dures3.length>=2){
-    return { mode:"rest", dateLabel, prog:"Récup — Z2 facile (plafond 152 bpm) ou repos complet.",
-      note:`Charge qualité lourde récente (${dures3.length} piqûre(s) en 3 j). On ne s'empile pas — prochaine séance qui compte : pas avant demain.` };
+const CAT_LBL = { compromise:"compromise", seuil:"seuil", force:"force", facile:"facile", recup:"récup" };
+/* Prochain entraînement = "reste à faire cette semaine ?".
+   Lit bilanSemaine() (trous priorisés vs template de phase) puis module par la FRAÎCHEUR :
+   si charge qualité récente, on ne pousse pas une séance dure — on propose le trou DOUX ou du repos. */
+function prochainEntrainement(ref=AUJ){
+  const b = bilanSemaine(ref);
+  const dures3 = seancesDures(SESSIONS,3,ref), dures1 = seancesDures(SESSIONS,1,ref);
+  const frais = !(dures1.length>=1 || dures3.length>=2);
+  const easy  = dures3.length===1;
+  const resteTxt = b.trous.length
+    ? b.trous.map(t=>CAT_LBL[t.cat]+(t.manque>1?" ×"+t.manque:"")).join(" · ")
+    : "Semaine bouclée ✓";
+  const excesTxt = b.exces ? ` ⚠ ${b.dursN}/${b.dursMax} jours durs (excès — pas de nouvelle grosse charge).` : "";
+  let mode, prog, note;
+  if(!frais){
+    mode="rest";
+    const doux = b.trous.find(t=>t.cat==="facile"||t.cat==="recup");
+    prog = doux ? PROG_CAT[doux.cat] : "Repos complet ou Z2 très facile (plafond 152 bpm).";
+    note = `${dures3.length} grosse(s) piqûre(s) qualité en 3 j — on ne s'empile pas.${excesTxt}`;
+  } else if(!b.trous.length){
+    mode="go"; prog="Cibles de la phase couvertes — bonus facile/mobilité ou repos choisi.";
+    note = `Toutes les cibles de la phase ${b.ph.n} sont remplies.${excesTxt}`;
+  } else {
+    const c = b.trous[0];
+    const dur = (c.cat==="compromise"||c.cat==="seuil");
+    mode = (easy && dur) ? "easy" : "go";
+    prog = PROG_CAT[c.cat];
+    note = (easy && dur)
+      ? `Priorité ${CAT_LBL[c.cat]} — 1 séance dure il y a 2-3 j, garde-la si tu te sens frais, sinon décale d'1 j.${excesTxt}`
+      : `Priorité de la semaine : ${CAT_LBL[c.cat]}. Jours durs ${b.dursN}/${b.dursMax}.${excesTxt}`;
   }
-  if(dures3.length===1){
-    return { mode:"easy", dateLabel, prog:"Footing Z2, technique sled ou mobilité.",
-      note:`1 séance dure dans les 3 jours. Garde une qualité pour dans 1-2 jours.` };
-  }
-  return { mode:"go", dateLabel, prog:SEANCE_PHASE[ph.n]||ph.focus,
-    note:`Bien reposé — feu vert pour une séance qui compte (focus phase ${ph.n}).` };
+  return { mode, resteTxt, prog, note, ph:b.ph };
 }
 
 /* ============================================================
@@ -514,9 +526,9 @@ function renderJour(){
 
   return `
   <div class="today ${dj.mode}">
-    <p class="kick">Prochain entraînement · Phase ${ph.n} — ${ph.lieu}</p>
-    <p class="big">${dj.dateLabel}</p>
-    <p class="sub"><b>${dj.prog}</b><br><span style="color:var(--hint)">${dj.note}</span></p>
+    <p class="kick">Reste à faire cette semaine · Phase ${ph.n} — ${ph.lieu}</p>
+    <p class="big">${dj.resteTxt}</p>
+    <p class="sub">→ <b>${dj.prog}</b><br><span style="color:var(--hint)">${dj.note}</span></p>
   </div>
 
   <div class="trio">
