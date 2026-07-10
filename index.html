@@ -3,31 +3,32 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta name="theme-color" content="#050505">
+<meta name="theme-color" content="#0B1A38">
 <title>Hyrox Pro — Max · V3</title>
 <!-- Charte Hyrox : polices via Google Fonts (rendu fidèle en ligne) + fallback système hors-ligne -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@600;700;800&family=Fjalla+One&family=Oswald:wght@500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 <style>
 /* ============================================================
    SILO 3 — PRÉSENTATION : tokens isolés. (inchangé vs V2)
    ============================================================ */
 :root{
   --hx-yellow:#F2EA00; --hx-yellow-bright:#FFF52E; --hx-yellow-deep:#C9C200; --hx-black:#0A0A0A;
-  --hx-ink-900:#050505; --hx-ink-850:#0C0D0E; --hx-ink-800:#121316; --hx-ink-700:#1A1C20;
-  --hx-ink-600:#24272C; --hx-ink-500:#34383F; --hx-ink-400:#4A4F57; --hx-ink-300:#6B7178;
-  --hx-ink-200:#969CA4; --hx-ink-100:#C7CCD2; --hx-ink-050:#EAECEF; --hx-white:#FFFFFF;
+  --hx-ink-900:#0B1A38; --hx-ink-850:#0C1D3E; --hx-ink-800:#0E2044; --hx-ink-700:#13264C;
+  --hx-ink-600:#294776; --hx-ink-500:#34578A; --hx-ink-400:#4A4F57; --hx-ink-300:#6B7178;
+  --hx-ink-200:#8CA0C2; --hx-ink-100:#B9C6DC; --hx-ink-050:#EEF2F8; --hx-white:#FFFFFF;
   --hx-lime:#B6F500; --hx-cyan:#2BD9D2; --hx-orange:#FF7A1A; --hx-red:#FF3B47; --hx-violet:#9B7CFF; --hx-green:#2FD27A;
-  --font-display:'Barlow Condensed','Arial Narrow',sans-serif;
+  --font-display:'Oswald','Barlow Condensed','Arial Narrow',sans-serif;
+  --font-hero:'Fjalla One','Oswald','Barlow Condensed',sans-serif;
   --font-body:'Barlow',system-ui,-apple-system,sans-serif;
   --font-mono:'JetBrains Mono',ui-monospace,'SF Mono',monospace;
   --bg:var(--hx-ink-900); --surface:var(--hx-ink-700); --line:var(--hx-ink-600);
   --txt:var(--hx-ink-050); --dim:var(--hx-ink-100); --hint:var(--hx-ink-200);
   --ok:var(--hx-green); --warn:var(--hx-orange); --bad:var(--hx-red);
-  --accent:var(--hx-yellow); --target:var(--hx-cyan); --real:var(--hx-orange);
-  --track:var(--hx-ink-600);
-  --radius:14px; --radius-sm:6px; --maxw:460px;
+  --accent:#FFFFFF; --target:var(--hx-cyan); --real:var(--hx-orange);
+  --track:#223A63;
+  --radius:3px; --radius-sm:2px; --maxw:460px;
 }
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 html,body{margin:0;background:var(--bg);color:var(--txt);font-family:var(--font-body);
@@ -57,15 +58,15 @@ h2{display:none}
 .row .nm small{color:var(--hint);font-size:12px}
 .pill{font-family:var(--font-mono);font-size:12px;padding:3px 9px;border-radius:var(--radius-sm);background:var(--track);color:var(--dim);white-space:nowrap}
 .pill.ok{background:rgba(47,210,122,.15);color:var(--ok)} .pill.warn{background:rgba(255,122,26,.15);color:var(--warn)} .pill.bad{background:rgba(255,59,71,.15);color:var(--bad)}
-.verdict{background:var(--hx-ink-800);border:1px solid var(--line);border-left:3px solid var(--accent);border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--dim);margin-bottom:12px}
+.verdict{background:var(--hx-ink-800);border:1px solid var(--line);border-radius:var(--radius);padding:11px 13px;font-size:13px;color:var(--dim);margin-bottom:12px}
 .verdict b{color:var(--txt)}
 /* --- Décision du jour (nouveau, V3) --- */
-.today{border-radius:var(--radius);padding:15px 15px 14px;margin-bottom:12px;border:1px solid var(--line);position:relative;overflow:hidden}
-.today.go{background:linear-gradient(135deg,rgba(47,210,122,.14),var(--surface));border-left:4px solid var(--ok)}
-.today.easy{background:linear-gradient(135deg,rgba(255,122,26,.14),var(--surface));border-left:4px solid var(--warn)}
-.today.rest{background:linear-gradient(135deg,rgba(255,59,71,.13),var(--surface));border-left:4px solid var(--bad)}
+.today{border-radius:var(--radius);padding:16px 15px 15px;margin-bottom:12px;border:1px solid var(--line);position:relative;overflow:hidden;background:var(--surface)}
+.today.go,.today.easy,.today.rest{background:var(--surface)}
+.today .scap{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.today .kick,.today .big,.today .sub{position:relative}
 .today .kick{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--hint);font-weight:600;margin:0 0 4px}
-.today .big{font-family:var(--font-display);font-size:26px;font-weight:800;text-transform:uppercase;letter-spacing:.02em;line-height:1.05;margin:0 0 6px}
+.today .big{font-family:var(--font-hero);font-size:29px;font-weight:400;text-transform:uppercase;letter-spacing:.015em;line-height:1.02;margin:0 0 6px;color:#fff}
 .today .sub{font-size:13px;color:var(--dim);line-height:1.45}
 .today .sub b{color:var(--txt)}
 /* --- stat trio (nouveau) --- */
@@ -526,6 +527,7 @@ function renderJour(){
 
   return `
   <div class="today ${dj.mode}">
+    <svg class="scap" viewBox="0 0 340 165" preserveAspectRatio="none" aria-hidden="true"><path d="M0,-2 L170,88 L340,-2 L340,44 L170,134 L0,44 Z" fill="#ffffff" opacity="0.11"/><path d="M0,-2 L170,88 L340,-2" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.20"/><path d="M0,44 L170,134 L340,44" fill="none" stroke="#ffffff" stroke-width="1.5" opacity="0.20"/></svg>
     <p class="kick">Reste à faire cette semaine · Phase ${ph.n} — ${ph.lieu}</p>
     <p class="big">${dj.resteTxt}</p>
     <p class="sub">→ <b>${dj.prog}</b><br><span style="color:var(--hint)">${dj.note}</span></p>
@@ -869,13 +871,13 @@ function pmcChartSVG(p){
   const Y=v=>H-18-((v-min)/((max-min)||1))*(H-18-8);
   const line=arr=>arr.map((v,i)=>`${X(i)},${Y(v)}`).join(" ");
   return `<svg viewBox="0 0 ${W} ${H}" width="100%" height="120">
-    <polyline points="${line(ctl)}" fill="none" stroke="#F2EA00" stroke-width="2"/>
+    <polyline points="${line(ctl)}" fill="none" stroke="#FFFFFF" stroke-width="2"/>
     <polyline points="${line(atl)}" fill="none" stroke="#FF7A1A" stroke-width="2" stroke-dasharray="4 3"/>
     <text x="${pad}" y="${H-4}" font-size="10" fill="#C7CCD2">${p.series[0].day.slice(5)}</text>
     <text x="${W-30}" y="${H-4}" font-size="10" fill="#C7CCD2">${p.series[n-1].day.slice(5)}</text>
   </svg>
   <div class="zleg" style="margin-top:4px">
-    <span><i style="background:#F2EA00"></i>fitness (CTL)</span>
+    <span><i style="background:#FFFFFF"></i>fitness (CTL)</span>
     <span><i style="background:#FF7A1A"></i>fatigue (ATL)</span></div>`;
 }
 
