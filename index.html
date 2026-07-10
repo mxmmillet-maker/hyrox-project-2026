@@ -370,6 +370,10 @@ function compromiseSessions(){ return SESSIONS.filter(s=>s.type==="m3"||(s.tags&
 function dernierDecouplage(){
   return SESSIONS.filter(s=>s.decouplagePct!=null).sort((a,b)=>a.date<b.date?1:-1)[0] || null;
 }
+/* Dernier test de référence PFT (T1…) — séance taguée "pft". Alimente la carte PFT (page Force). */
+function dernierPFT(){ return SESSIONS.filter(s=>(s.tags||[]).includes("pft")).sort((a,b)=>a.date<b.date?1:-1)[0] || null; }
+/* Format mm:ss depuis une durée en minutes (25,6 → "25:36"). */
+function mmss(min){ const s=Math.round(min*60); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
 /* Bornes de la semaine (lun→dim) contenant ref, en chaînes ISO "YYYY-MM-DD" (hi = lundi
    suivant, exclu) → comparaisons de dates sans souci de fuseau. Base commune mollets + bilan. */
 function bornesSemaine(ref=AUJ){
@@ -668,12 +672,32 @@ function renderForce(){
     <p class="lbl">Sled</p>
     <p class="muted">Pull = technique avant charge (jambes en synchro, pas le dos). Push = entretien, ne jamais laisser le traîneau s'arrêter, micro-pause à mi-longueur.</p>
   </div>
+  ${cartePFT()}`;
+}
+/* Carte PFT — LIT dernierPFT() (plus aucun résultat en dur). Vide → amorce ; rempli → chrono + verdict vs cible. */
+function cartePFT(){
+  const p = dernierPFT(), cibleSec = CIBLES.pftSec;
+  const proto = "1000m / 50 BBJ / 100 fentes / 1000m row / 30 pompes / 100 WB";
+  if(!p) return `
   <div class="card">
     <p class="lbl">Endurance stations — PFT (T1)</p>
     <table class="refs">
-      <tr><td>1000m / 50 BBJ / 100 fentes / 1000m row / 30 pompes / 100 WB</td><td>—</td></tr>
-      <tr><td>Cible</td><td>sub-25 min</td></tr></table>
-    <p class="amorce">⚠ T1 à faire avant la fin du Club Med — pose le 1ᵉʳ repère stations.</p>
+      <tr><td>${proto}</td><td>—</td></tr>
+      <tr><td>Cible</td><td>sub-${mmss(cibleSec/60)} min</td></tr></table>
+    <p class="amorce">⚠ T1 à faire — pose le 1ᵉʳ repère stations.</p>
+  </div>`;
+  const totSec = Math.round(p.dureeMin*60), delta = totSec - cibleSec, ok = delta<=0;
+  const verdict = ok ? `sub-${mmss(cibleSec/60)} ✓ · ${mmss(-delta/60)} de marge`
+                     : `+${delta}s au-dessus du sub-${mmss(cibleSec/60)}`;
+  return `
+  <div class="card">
+    <p class="lbl">Endurance stations — PFT (${(p.tags||[]).includes("pft")?"T1":"T"})</p>
+    <table class="refs">
+      <tr><td>T1 — ${p.date.slice(8)}/${p.date.slice(5,7)}</td><td><b>${mmss(p.dureeMin)}</b></td></tr>
+      <tr><td>Cible</td><td>sub-${mmss(cibleSec/60)}</td></tr>
+      <tr><td>Coût</td><td>FC ${fmt(p.fcMoy,0)} moy / ${p.fcMax} max · RPE ${p.rpe}</td></tr>
+    </table>
+    <p class="muted" style="margin-top:8px">${proto}. <span class="pill ${ok?'ok':'warn'}">${verdict}</span></p>
   </div>`;
 }
 
